@@ -72,7 +72,7 @@ extern "C" {
 #define DEBUG_PM                        ON
 #define DEBUG_OTA                       OFF
 #define DEBUG_CHT8305                   ON
-#define DEBUG_LEAK                      ON
+#define DEBUG_LEAK                      OFF
 #define DEBUG_STA_STATUS                OFF
 #define DEBUG_ONOFF                     ON
 /* PM */
