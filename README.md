@@ -3,6 +3,7 @@
 ### Custom firmware for Tuya sensor models
 
 - _TZ3000_k4ej3ww2
+- _TZ3000_kstbkt6a
 
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/ts0207_tz3000.jpg"/>
 
