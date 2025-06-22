@@ -347,11 +347,15 @@ void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
             printf("OTA update start.\r\n");
 #endif /* UART_PRINTF_MODE */
             zb_setPollRate(QUEUE_POLL_RATE);
+            g_appCtx.not_sleep = true;
+            if (g_appCtx.timerSetPollRateEvt) {
+                TL_ZB_TIMER_CANCEL(&g_appCtx.timerSetPollRateEvt);
+            }
         }else{
 
         }
     }else if(evt == OTA_EVT_COMPLETE){
-        zb_setPollRate(POLL_RATE * 3600);
+        app_setPollRate();
 
         if(status == ZCL_STA_SUCCESS){
 #if UART_PRINTF_MODE && DEBUG_OTA
@@ -365,7 +369,7 @@ void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
             ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
         }
     }else if(evt == OTA_EVT_IMAGE_DONE){
-        zb_setPollRate(POLL_RATE * 3600);
+        app_setPollRate();
     }
 
 }
