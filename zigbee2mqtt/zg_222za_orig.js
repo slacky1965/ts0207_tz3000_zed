@@ -4,7 +4,7 @@ const definition = {
     fingerprint: [{manufacturerName: '_TZ3000_k4ej3ww2'}
                  ],
     zigbeeModel: ['TS0207'],
-    model: 'Original Tuya Temperature/Humidity sensor ready for update',
+    model: 'Original Tuya Water Leak sensor ready for update',
     vendor: 'Slacky-DIY',
     description: 'Original Tuya waterleak sensor ready for custom Firmware update',
     extend: [
