@@ -10,6 +10,8 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board1.jpg"/>
 
+<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/about_orig.jpg"/>
+
 **Автор не несет никакой отвественности, если вы, воспользовавшись этим проектом, превратите свой умный датчик в полоумный.**
 
 Если у вас другая сигнатура, лучше не заливать, не проверив на совпадение GPIO.
