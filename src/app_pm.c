@@ -32,7 +32,7 @@ void app_lowPowerEnter() {
     if (g_appCtx.not_sleep) {
         /* Deep sleep with SRAM retention */
         drv_pm_lowPowerEnter();
-    } else if (zb_isDeviceJoinedNwk()){
+    } else /*if (zb_isDeviceJoinedNwk())*/ {
         /* Deep sleep without SRAM retention */
 #if UART_PRINTF_MODE && DEBUG_PM
         printf("Deep sleep start\r\n");

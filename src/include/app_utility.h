@@ -42,7 +42,7 @@ int32_t poll_rateAppCb(void *arg);
 int32_t delayedMcuResetCb(void *arg);
 int32_t delayedFactoryResetCb(void *arg);
 int32_t delayedFullResetCb(void *arg);
-void app_setPollRate();
+void app_setPollRate(uint32_t sec);
 
 
 #endif /* SRC_INCLUDE_APP_UTILITY_H_ */

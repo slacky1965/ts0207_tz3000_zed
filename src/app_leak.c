@@ -21,39 +21,50 @@ void fillIASAddress(epInfo_t* pdstEpInfo) {
     }
 }
 
+static void app_leakOn(void *args) {
+
+    zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
+
+#if UART_PRINTF_MODE && DEBUG_ONOFF
+    printf("Switch action: 0x0%x\r\n", onoffCfgAttrs->switchActions);
+#endif /* DEBUG_ONOFF */
+
+    switch (onoffCfgAttrs->switchActions) {
+        case ZCL_SWITCH_ACTION_ON_OFF:
+            cmdOnOff(ZCL_CMD_ONOFF_OFF);
+            break;
+        case ZCL_SWITCH_ACTION_OFF_ON:
+            cmdOnOff(ZCL_CMD_ONOFF_ON);
+            break;
+        case ZCL_SWITCH_ACTION_TOGGLE:
+            cmdOnOff(ZCL_CMD_ONOFF_TOGGLE);
+            break;
+        default:
+            break;
+    }
+
+}
+
+static int32_t leak_onTimerCb(void *args) {
+
+    TL_SCHEDULE_TASK(app_leakOn, NULL);
+
+    return -1;
+}
+
 void waterleak_handler() {
 
     uint16_t len;
     epInfo_t dstEpInfo;
     zoneStatusChangeNoti_t statusChangeNotification;
-    zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
 
     if (drv_gpio_read(WLEAK_GPIO)) {
         if (!g_appCtx.leak) {
             g_appCtx.leak = true;
-            app_setPollRate();
 
 #if UART_PRINTF_MODE && DEBUG_LEAK
             printf("There is a water leak\r\n");
 #endif /* DEBUG_LEAK */
-
-#if UART_PRINTF_MODE && DEBUG_ONOFF
-            printf("Switch action: 0x0%x\r\n", onoffCfgAttrs->switchActions);
-#endif /* DEBUG_ONOFF */
-
-            switch(onoffCfgAttrs->switchActions) {
-                case ZCL_SWITCH_ACTION_ON_OFF:
-                    cmdOnOff(ZCL_CMD_ONOFF_OFF);
-                    break;
-                case ZCL_SWITCH_ACTION_OFF_ON:
-                    cmdOnOff(ZCL_CMD_ONOFF_ON);
-                    break;
-                    case ZCL_SWITCH_ACTION_TOGGLE:
-                        cmdOnOff(ZCL_CMD_ONOFF_TOGGLE);
-                        break;
-                default:
-                    break;
-            }
 
             fillIASAddress(&dstEpInfo);
 
@@ -66,13 +77,17 @@ void waterleak_handler() {
             statusChangeNotification.delay = 0;
 
             zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+
+            TL_ZB_TIMER_SCHEDULE(leak_onTimerCb, NULL, TIMEOUT_250MS);
+            app_setPollRate(TIMEOUT_20SEC);
         }
     } else {
         if (g_appCtx.leak) {
             g_appCtx.leak = false;
-            app_setPollRate();
+            app_setPollRate(TIMEOUT_20SEC);
 
 #if UART_PRINTF_MODE && DEBUG_LEAK
+            zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
             printf("No water leakage occurs\r\n");
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("Switch action: 0x0%x\r\n", onoffCfgAttrs->switchActions);

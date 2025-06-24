@@ -43,6 +43,8 @@ static void buttonKeepPressed(u8 btNum) {
         g_appCtx.net_steer_start = true;
         TL_ZB_TIMER_SCHEDULE(net_steer_start_offCb, NULL, TIMEOUT_1MIN30SEC);
         light_blink_start(90, 100, 1000);
+        app_setPollRate(TIMEOUT_1MIN30SEC);
+
     }
 }
 
@@ -55,7 +57,7 @@ static void buttonSinglePressed(u8 btNum) {
             printf("Button push 1 time\r\n");
 #endif
             if(zb_isDeviceJoinedNwk()){
-                app_setPollRate();
+                app_setPollRate(TIMEOUT_20SEC);
             } else {
                 zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
             }
