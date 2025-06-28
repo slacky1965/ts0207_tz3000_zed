@@ -1,7 +1,8 @@
 const {identify, reporting, ota} = require('zigbee-herdsman-converters/lib/modernExtend');
 
 const definition = {
-    fingerprint: [{manufacturerName: '_TZ3000_k4ej3ww2'}
+    fingerprint: [{manufacturerName: '_TZ3000_k4ej3ww2'},
+                  {manufacturerName: '_TZ3000_kstbkt6a'}
                  ],
     zigbeeModel: ['TS0207'],
     model: 'Original Tuya Water Leak sensor ready for update',
