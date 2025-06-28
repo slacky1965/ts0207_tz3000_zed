@@ -61,7 +61,7 @@ ota:
 
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/tuya_ready.jpg"/>
 
-Далее идем в раздел OTA. И видим там свое устройство. Жмем проверить обновления.
+Далее идем в раздел OTA. И видим там свое устройство. Будим датчик, нажимая на его кнопку и только потом жмем проверить обновления.
 
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/update.jpg"/>
 	
