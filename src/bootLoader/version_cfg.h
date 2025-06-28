@@ -25,7 +25,33 @@
 
 #pragma once
 
+/* Board ID */
+
+#define BOARD_ZG_222Z                   1
+#define BOARD_ZG_222ZA                  2
+
+#ifndef BOARD
+#define BOARD                           BOARD_ZG_222ZA
+#endif
+
 #include "../common/comm_cfg.h"
+
+#if defined(MCU_CORE_826x)
+    #if (CHIP_8269)
+        #define CHIP_TYPE                   TLSR_8269
+    #else
+        #define CHIP_TYPE                   TLSR_8267
+    #endif
+#elif defined(MCU_CORE_8258)
+//    #error TLSR_8258_1M
+    #define CHIP_TYPE                       TLSR_8258_1M//TLSR_8258_512K//
+#elif defined(MCU_CORE_8278)
+        #define CHIP_TYPE                   TLSR_8278
+#elif defined(MCU_CORE_B91)
+        #define CHIP_TYPE                   TLSR_B91
+#endif
+
+
 
 #define APP_RELEASE							0x10//app release 1.0
 #define APP_BUILD							0x01//app build 01

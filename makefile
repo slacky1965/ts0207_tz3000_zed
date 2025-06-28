@@ -1,10 +1,50 @@
 # Set Project Name
 PROJECT_NAME := ts0207_tz3000_zed
 
+BOARD_NAME ?= ts0207_tz3000
+
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
-COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+BOARD_NAME ?= ZG_222Z
+
+BOARD_ZG_222Z  = 1
+BOARD_ZG_222ZA = 2
+
+ifeq ($(BOARD_NAME),ZG_222ZA)
+	CHIP_FLASH_SIZE = 1024
+	BOARD = $(BOARD_ZG_222ZA)
+else
+	ifeq ($(BOARD_NAME),ZG_222Z)
+		CHIP_FLASH_SIZE = 512
+		BOARD = $(BOARD_ZG_222Z)
+	endif
+endif
+
+
+CHIP_FLASH_SIZE ?= 512
+
+COMPILE_OS = $(shell uname -o)
+LINUX_OS = GNU/Linux
+
+ifeq ($(COMPILE_OS),$(LINUX_OS))	
+	COMPILE_PREFIX = /opt/tc32/bin/tc32
+else
+	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+	WIN32 = -DWIN32=1
+endif
+
+ifeq ($(CHIP_FLASH_SIZE),512)
+	PFX_NAME = 512K
+	VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' ./src/include/version_cfg_512k.h)
+else
+	ifeq ($(CHIP_FLASH_SIZE),1024)
+		PFX_NAME = 1M
+		VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' ./src/include/version_cfg_1m.h)
+	else
+		PFX_NAME = UNKNOWN
+	endif
+endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
 CC      = $(COMPILE_PREFIX)-elf-gcc
@@ -19,7 +59,7 @@ LIBS := -lzb_ed -ldrivers_8258
 
 DEVICE_TYPE = -DEND_DEVICE=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -89,7 +129,10 @@ endif
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
--DBOOT_SIZE=$(BOOT_SIZE)
+-DBOOT_SIZE=$(BOOT_SIZE) \
+-DBOARD=$(BOARD) \
+-DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
+
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -130,7 +173,10 @@ LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
 BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
 ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
 FW_FILE  := $(OUT_PATH)/firmware.bin
-BOOT_FILE := $(OUT_PATH)/bootloader.bin
+LOWER_NAME := $(shell echo $(BOARD_NAME) | tr [:upper:] [:lower:])
+FIRMWARE_FILE := $(LOWER_NAME)_$(PFX_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+BOOT_FILE := $(BIN_PATH)/bootloader_$(PFX_NAME).bin
+
 
 SIZEDUMMY += \
 sizedummy \
@@ -146,7 +192,7 @@ flash-orig-write:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_PATH)/ts0207_tz3000_orig.bin
 	
 flash-orig-read:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x100000 ts0207_tz3000_orig.bin
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x80000 ts0207_tz3000_orig.bin
 	
 flash-orig-bootloader-read:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x8000 ts0207_tz3000_orig_bootloadter.bin
@@ -200,7 +246,21 @@ $(LST_FILE): $(ELF_FILE)
 	$(OBJDUMP) -x -D -l -S $(ELF_FILE)  > $(LST_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
-	
+
+
+ifeq ($(CHIP_FLASH_SIZE),512)
+	@echo 'Create Flash image (binary format)'
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
+	@python3 $(TL_CHECK) $(BIN_FILE)
+	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
+	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_PATH)/$(FIRMWARE_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo ' '
+	@echo 'Finished building: $@'
+	@echo ' '
+else
+ifeq ($(CHIP_FLASH_SIZE),1024)
 ifeq ($(CHECK_BL),1)
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
@@ -216,14 +276,18 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@cat $(BIN_FILE) $(BOOT_FILE) > $(FW_FILE)
-	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
-	@echo 'Create zigbee OTA file'
-	@python3 $(MAKE_OTA) -ot $(PROJECT_NAME) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
+	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_PATH)/$(FIRMWARE_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_PATH)/$(FIRMWARE_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
+	@echo CHIP_FLASH_SIZE: $(CHIP_FLASH_SIZE)
 endif
+endif
+endif
+	
 
 #$(OBJ_DIR)/bin_updater.o: $(OBJ_DIR)
 #    @objcopy -I binary --output-target elf32-littlearm --rename-section .data=.bin_files ./updater.bin $@	 

@@ -4,6 +4,24 @@ PROJECT_NAME := bootloader
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
+BOARD_NAME ?= ZG_222Z
+
+BOARD_ZG_222Z  = 1
+BOARD_ZG_222ZA = 2
+
+ifeq ($(BOARD_NAME),ZG_222ZA)
+	CHIP_FLASH_SIZE = 1024
+	BOARD = $(BOARD_ZG_222ZA)
+else
+	ifeq ($(BOARD_NAME),ZG_222Z)
+		CHIP_FLASH_SIZE = 512
+		BOARD = $(BOARD_ZG_222Z)
+	else
+		CHIP_FLASH_SIZE = 512
+		BOARD = $(BOARD_ZG_222Z)
+	endif
+endif
+
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
 
@@ -25,7 +43,7 @@ SIZE	= $(COMPILE_PREFIX)-elf-size
 LIBS := -ldrivers_8258
 
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -66,6 +84,8 @@ GCC_FLAGS := \
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
+-DBOARD=$(BOARD) \
+-DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE) \
 -D__PROJECT_TL_BOOT_LOADER__=1
 
 OBJ_SRCS := 

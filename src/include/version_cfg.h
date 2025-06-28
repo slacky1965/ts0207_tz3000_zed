@@ -25,7 +25,32 @@
 
 #pragma once
 
+#ifndef MCU_CORE_8258
+#define MCU_CORE_8258   1
+#endif
+
+/* Board ID */
+
+#define BOARD_ZG_222Z                   1
+#define BOARD_ZG_222ZA                  2
+
+#ifndef BOARD
+#define BOARD                           BOARD_ZG_222ZA
+#endif
+
 #include "../common/comm_cfg.h"
+
+#ifndef CHIP_FLASH_SIZE
+#define CHIP_FLASH_SIZE 512
+#endif
+
+#if (CHIP_FLASH_SIZE == 512)
+#include "version_cfg_512k.h"
+#elif (CHIP_FLASH_SIZE == 1024)
+#include "version_cfg_1m.h"
+#else
+#error CHIP_TYPE must be TLSR_8258_512K or TLSR_8258_1M
+#endif
 
 #define APP_RELEASE                         0x10        //app release 1.0
 #ifndef VERSION_BUILD
@@ -81,11 +106,19 @@
  * 0x14 - Air monitor
  * 0x15 - Tuya Temperature and Humidity sensors ts0201_tz3000
  * 0x16 - Tuya Temperature and Humidity sensors ts0601_tze200 ZG-227Z
- * 0x17 - Tuya water leak sensor ZG-222ZA
+ * 0x17 - Tuya water leak sensor ZG-222ZA, ZTU or tlsr825x with 1M
+ * 0x18 - Tuya water leak sensor ZG-222ZA, tlsr825x with 512K
  *
  */
 
+#if (CHIP_FLASH_SIZE == 512)
+#define IMAGE_TYPE_APP              (0x18 | (IMAGE_TYPE_BOOT_FLAG << 7))
+#elif (CHIP_FLASH_SIZE == 1024)
 #define IMAGE_TYPE_APP              (0x17 | (IMAGE_TYPE_BOOT_FLAG << 7))
+#else
+#error CHIP_TYPE must be TLSR_8258_512K or TLSR_8258_1M
+#endif
+
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
