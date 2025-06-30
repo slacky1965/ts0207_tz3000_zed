@@ -49,14 +49,6 @@ extern "C" {
 #define LONG_POLL           REPORTING_MIN
 #define TIMEOUT_NET         TIMEOUT_30MIN
 
-/**********************************************************************
- * Product Information
- */
-
-#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
-#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
-
-
 /* Debug mode config */
 #define UART_PRINTF_MODE                ON
 #define USB_PRINTF_MODE                 OFF

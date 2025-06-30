@@ -1,7 +1,7 @@
 #ifndef SRC_COMMON_BOARD_ZG_222Z_H_
 #define SRC_COMMON_BOARD_ZG_222Z_H_
 
-#define CHIP_FLASH_SIZE 512
+#define CHIP_FLASH_SIZE     512
 
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
@@ -14,13 +14,13 @@
 
 /***************************** Configure LED  ***************************************/
 
-#define LED_ON                  1
-#define LED_OFF                 0
-#define LED_STATUS              GPIO_PD7
-#define PD7_FUNC                AS_GPIO
-#define PD7_OUTPUT_ENABLE       LED_ON
-#define PD7_INPUT_ENABLE        LED_OFF
-#define PD7_DATA_OUT            LED_OFF
+#define LED_ON                  0
+#define LED_OFF                 1
+#define LED_STATUS              GPIO_PC4
+#define PC4_FUNC                AS_GPIO
+#define PC4_OUTPUT_ENABLE       ON
+#define PC4_INPUT_ENABLE        OFF
+#define PC4_DATA_OUT            ON
 
 //#define LED_POWER               GPIO_PA0
 //#define PA0_FUNC                AS_GPIO
@@ -32,12 +32,12 @@
 
 
 /************************* Configure LEAK GPIO **************************************/
-#define WLEAK_GPIO              GPIO_PD3
-#define PD3_INPUT_ENABLE        ON
-#define PD3_DATA_OUT            OFF
-#define PD3_OUTPUT_ENABLE       OFF
-#define PD3_FUNC                AS_GPIO
-#define PULL_WAKEUP_SRC_PD3     PM_PIN_PULLDOWN_100K //PM_PIN_PULLUP_1M
+#define WLEAK_GPIO              GPIO_PB6
+#define PB6_INPUT_ENABLE        ON
+#define PB6_DATA_OUT            OFF
+#define PB6_OUTPUT_ENABLE       OFF
+#define PB6_FUNC                AS_GPIO
+#define PULL_WAKEUP_SRC_PB6     PM_PIN_PULLUP_10K //PM_PIN_PULLDOWN_100K //PM_PIN_PULLUP_1M
 
 /************************* Configure KEY GPIO ***************************************/
 #define MAX_BUTTON_NUM  1

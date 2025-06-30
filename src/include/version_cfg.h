@@ -35,10 +35,24 @@
 #define BOARD_ZG_222ZA                  2
 
 #ifndef BOARD
-#define BOARD                           BOARD_ZG_222ZA
+#define BOARD                           BOARD_ZG_222Z
 #endif
 
 #include "../common/comm_cfg.h"
+
+/**********************************************************************
+ * Product Information
+ */
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#if (BOARD == BOARD_ZG_222Z)
+#define IMAGE_TYPE_BOARD    18
+#define ZCL_BASIC_MODEL_ID     {13,'Z','G','-','2','2','2','Z','-','z','-','S','l','D'}
+#elif (BOARD == BOARD_ZG_222ZA)
+#define IMAGE_TYPE_BOARD    17
+#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
+#else
+#error BOARD must be defined
+#endif
 
 #ifndef CHIP_FLASH_SIZE
 #define CHIP_FLASH_SIZE 512
@@ -111,14 +125,7 @@
  *
  */
 
-#if (CHIP_FLASH_SIZE == 512)
-#define IMAGE_TYPE_APP              (0x18 | (IMAGE_TYPE_BOOT_FLAG << 7))
-#elif (CHIP_FLASH_SIZE == 1024)
-#define IMAGE_TYPE_APP              (0x17 | (IMAGE_TYPE_BOOT_FLAG << 7))
-#else
-#error CHIP_TYPE must be TLSR_8258_512K or TLSR_8258_1M
-#endif
-
+#define IMAGE_TYPE_APP              (IMAGE_TYPE_BOARD | (IMAGE_TYPE_BOOT_FLAG << 7))
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.

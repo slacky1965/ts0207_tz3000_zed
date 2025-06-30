@@ -10,13 +10,16 @@ BOARD_ZG_222Z  = 1
 BOARD_ZG_222ZA = 2
 
 ifeq ($(BOARD_NAME),ZG_222ZA)
+	PFX_NAME = 1M
 	CHIP_FLASH_SIZE = 1024
 	BOARD = $(BOARD_ZG_222ZA)
 else
 	ifeq ($(BOARD_NAME),ZG_222Z)
+		PFX_NAME = 512K
 		CHIP_FLASH_SIZE = 512
 		BOARD = $(BOARD_ZG_222Z)
 	else
+		PFX_NAME = 512K
 		CHIP_FLASH_SIZE = 512
 		BOARD = $(BOARD_ZG_222Z)
 	endif
@@ -111,9 +114,10 @@ RM := rm -rf
 -include $(MAKE_INCLUDES)/bootloader.mk
 
 # Add inputs and outputs from these tool invocations to the build variables 
-LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
-BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
-ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
+BOOTLOADER_NAME = $(PROJECT_NAME)_$(PFX_NAME)
+LST_FILE := $(OUT_PATH)/$(BOOTLOADER_NAME).lst
+BIN_FILE := $(BIN_PATH)/$(BOOTLOADER_NAME).bin
+ELF_FILE := $(OUT_PATH)/$(BOOTLOADER_NAME).elf
 MARKER_BIN := $(BIN_PATH)/marker.bin
 
 
@@ -126,8 +130,9 @@ bootloader: pre-build main-build
 
 bootloader-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x7f00 0x100
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x7ff0 $(MARKER_BIN)
+
+#	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x7f00 0x100
+#	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x7ff0 $(MARKER_BIN)
 
 # Main-build Target
 main-build: clean $(ELF_FILE) secondary-outputs
@@ -150,7 +155,6 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
-	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME).bin
 	@echo 'Finished building: $@'
 	@echo ' '
 

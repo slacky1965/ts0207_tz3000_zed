@@ -1,9 +1,6 @@
 #ifndef SRC_INCLUDE_APP_LED_H_
 #define SRC_INCLUDE_APP_LED_H_
 
-#define LED_ON                      1
-#define LED_OFF                     0
-
 void light_blink_start(uint8_t times, uint16_t ledOnTime, uint16_t ledOffTime);
 void light_blink_stop(void);
 

@@ -1,8 +1,6 @@
 # Set Project Name
 PROJECT_NAME := ts0207_tz3000_zed
 
-BOARD_NAME ?= ts0207_tz3000
-
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
@@ -18,11 +16,13 @@ else
 	ifeq ($(BOARD_NAME),ZG_222Z)
 		CHIP_FLASH_SIZE = 512
 		BOARD = $(BOARD_ZG_222Z)
+	else
+		CHIP_FLASH_SIZE = 512
+		BOARD = $(BOARD_ZG_222Z)
 	endif
 endif
 
 
-CHIP_FLASH_SIZE ?= 512
 
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
@@ -59,7 +59,7 @@ LIBS := -lzb_ed -ldrivers_8258
 
 DEVICE_TYPE = -DEND_DEVICE=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE) -DBOARD=$(BOARD)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -169,13 +169,15 @@ RM := rm -rf
 -include ./project.mk
 
 # Add inputs and outputs from these tool invocations to the build variables 
-LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
-BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
-ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
-FW_FILE  := $(OUT_PATH)/firmware.bin
 LOWER_NAME := $(shell echo $(BOARD_NAME) | tr [:upper:] [:lower:])
-FIRMWARE_FILE := $(LOWER_NAME)_$(PFX_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+FIRMWARE_NAME := $(LOWER_NAME)_$(PFX_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD)
+FIRMWARE_FILE := $(FIRMWARE_NAME).bin
 BOOT_FILE := $(BIN_PATH)/bootloader_$(PFX_NAME).bin
+APPENDIX := $(BIN_PATH)/marker.bin
+LST_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).lst
+BIN_FILE := $(BIN_PATH)/$(FIRMWARE_NAME).bin 
+#$(OUT_PATH)/$(PROJECT_NAME).bin
+ELF_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).elf
 
 
 SIZEDUMMY += \
@@ -187,6 +189,9 @@ all: pre-build main-build
 
 flash: $(BIN_FILE)
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
+
+flash-512k: $(BIN_FILE)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_FILE)
 
 flash-orig-write:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_PATH)/ts0207_tz3000_orig.bin
@@ -216,9 +221,6 @@ erase-flash-macaddr:
 flash-bootloader:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOTLOADER)
 	
-flash-ota:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x70000 $(FW_FILE)
-	
 test-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -s i
 
@@ -247,18 +249,27 @@ $(LST_FILE): $(ELF_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-
+ #$(BOOT_FILE)
+ 
 ifeq ($(CHIP_FLASH_SIZE),512)
+$(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
-	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
-	@echo 'Create zigbee OTA file from' $(BIN_PATH)/$(FIRMWARE_FILE)
-	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
+	
+#	@echo 'Create zigbee Tuya OTA file'
+#	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(APPENDIX)
+#	@echo 'Copy $(BIN_FILE) to $(BIN_FILE)
+#$(BIN_PATH)/$(FIRMWARE_FILE)'
+#	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
+#$(BIN_PATH)/$(FIRMWARE_FILE)
+#$(BIN_PATH)/$(FIRMWARE_FILE)
+
 else
 ifeq ($(CHIP_FLASH_SIZE),1024)
 ifeq ($(CHECK_BL),1)
@@ -267,7 +278,8 @@ $(BIN_FILE): $(ELF_FILE)
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
 	@echo 'Create zigbee Tuya OTA file'
-	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-ts0207_tz3000_zrd.zigbee $(BIN_FILE) $(BOOT_FILE)
+	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(BOOT_FILE)
+	@rm $(BIN_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
@@ -276,14 +288,11 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
-	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
-	@echo 'Create zigbee OTA file from' $(BIN_PATH)/$(FIRMWARE_FILE)
-	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
-	@echo CHIP_FLASH_SIZE: $(CHIP_FLASH_SIZE)
 endif
 endif
 endif
@@ -301,11 +310,13 @@ sizedummy: $(ELF_FILE)
 # Other Targets
 clean:
 	@echo $(INCLUDE_PATHS)
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_FILE)
+#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
 	-@echo ' '
 
 clean-project:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_FILE)
+#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-@echo ' '
 	

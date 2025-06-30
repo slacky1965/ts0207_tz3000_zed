@@ -58,7 +58,13 @@ void waterleak_handler() {
     epInfo_t dstEpInfo;
     zoneStatusChangeNoti_t statusChangeNotification;
 
+#if (BOARD == BOARD_ZG_222Z)
+    if (!drv_gpio_read(WLEAK_GPIO)) {
+#elif (BOARD == BOARD_ZG_222ZA)
     if (drv_gpio_read(WLEAK_GPIO)) {
+#else
+#error BOARD must be defined
+#endif
         if (!g_appCtx.leak) {
             g_appCtx.leak = true;
 
