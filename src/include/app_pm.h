@@ -14,5 +14,6 @@ void app_lowPowerEnter();
 
 void app_set_analog_reg(uint8_t *reg_data);
 uint8_t app_get_analog_reg();
+int32_t check_sleepCb(void *args);
 
 #endif /* SRC_INCLUDE_APP_PM_H_ */

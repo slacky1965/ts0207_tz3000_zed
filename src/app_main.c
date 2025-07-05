@@ -7,7 +7,7 @@
 app_ctx_t g_appCtx = {
         .bdbFBTimerEvt = NULL,
         .timerForcedReportEvt = NULL,
-        .timerNoJoinedEvt = NULL,
+        .timerCheckSleepEvt = NULL,
         .timerSetPollRateEvt = NULL,
         .oriSta = false,
 //        .time_without_joined = 0,
@@ -170,21 +170,18 @@ void user_app_init(void)
 
     batteryCb(NULL);
 
-//#if DEBUG_BATTERY
-//    g_appCtx.timerBatteryEvt = TL_ZB_TIMER_SCHEDULE(batteryCb, NULL, 5000);
-//#else
-//    g_appCtx.timerBatteryEvt = TL_ZB_TIMER_SCHEDULE(batteryCb, NULL, BATTERY_TIMER_INTERVAL);
-//#endif
-
+    if (zb_getLocalShortAddr() < 0xFFF8) {
+        app_setPollRate(TIMEOUT_20SEC);
+    }
 }
 
 void app_task(void) {
 
     button_handler();
+    waterleak_handler();
 
     if (zb_isDeviceJoinedNwk()) {
-        waterleak_handler();
-        if (clock_time_exceed(g_appCtx.read_sensor_time, 15 * 1000 * 1000)) {
+        if (clock_time_exceed(g_appCtx.read_sensor_time, TIMEOUT_TICK_15SEC)) {
             g_appCtx.read_sensor_time = clock_time();
             light_blink_stop();
             light_blink_start(1, 30, 30);
@@ -197,7 +194,7 @@ void app_task(void) {
         report_handler();
 #if PM_ENABLE
         button_handler();
-        if(!button_idle()) {
+        if(!button_idle() && !waterleak_idle()) {
             app_lowPowerEnter();
         }
 #endif

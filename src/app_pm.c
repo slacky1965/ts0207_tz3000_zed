@@ -81,3 +81,27 @@ void app_set_analog_reg(uint8_t *reg_data) {
 uint8_t app_get_analog_reg() {
     return analog_read(APP_ANALOG_REG);
 }
+
+int32_t check_sleepCb(void *args) {
+
+    if (zb_getLocalShortAddr() < 0xFFF8) {
+
+        printf("check_sleepCb - reset\r\n");
+        sleep_ms(250);
+
+        zb_resetDevice();
+        return -1;
+    }
+
+//    if (zb_isDeviceJoinedNwk()) {
+//
+//        printf("check_sleepCb - reset\r\n");
+//        sleep_ms(250);
+//
+//        zb_resetDevice();
+//        return -1;
+//    }
+
+    printf("check_sleepCb - no joined\r\n");
+    return 0;
+}

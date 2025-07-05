@@ -51,11 +51,27 @@ int32_t delayedFullResetCb(void *arg) {
 
 static int32_t set_pollRateCb(void *args) {
 
+    uint32_t sec = (u32)args;
+
 //    printf("set_pollRateCb\r\n");
 
 //    zb_setPollRate(POLL_RATE * 60);
 
-    g_appCtx.not_sleep = false;
+    if (zb_getLocalShortAddr() < 0xFFF8) {
+//        printf("zb_getLocalShortAddr() < 0xFFF8\r\n");
+        if (zb_isDeviceJoinedNwk()) {
+            g_appCtx.not_sleep = false;
+        } else {
+            zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+            if (g_appCtx.timerCheckSleepEvt) {
+                printf("2. checkSleepTimer restart\r\n");
+                TL_ZB_TIMER_CANCEL(&g_appCtx.timerCheckSleepEvt);
+            }
+            g_appCtx.timerCheckSleepEvt = TL_ZB_TIMER_SCHEDULE(check_sleepCb, NULL, (sec + TIMEOUT_10SEC));
+
+            return 0;
+        }
+    }
 
     g_appCtx.timerSetPollRateEvt = NULL;
     return -1;
@@ -69,35 +85,12 @@ void app_setPollRate(uint32_t sec) {
     if (g_appCtx.timerSetPollRateEvt) {
         TL_ZB_TIMER_CANCEL(&g_appCtx.timerSetPollRateEvt);
     }
-    g_appCtx.timerSetPollRateEvt = TL_ZB_TIMER_SCHEDULE(set_pollRateCb, NULL, sec /*TIMEOUT_20SEC*/);
+    g_appCtx.timerSetPollRateEvt = TL_ZB_TIMER_SCHEDULE(set_pollRateCb, (void *)sec, sec /*TIMEOUT_20SEC*/);
 
+    if (g_appCtx.timerCheckSleepEvt) {
+        printf("1. checkSleepTimer restart\r\n");
+        TL_ZB_TIMER_CANCEL(&g_appCtx.timerCheckSleepEvt);
+    }
+    g_appCtx.timerCheckSleepEvt = TL_ZB_TIMER_SCHEDULE(check_sleepCb, NULL, (sec + TIMEOUT_10SEC));
 }
 
-//int32_t no_joinedCb(void *arg) {
-//
-//    if (!zb_isDeviceJoinedNwk()) {
-//
-//        if (tl_stackBusy() || !zb_isTaskDone()) {
-//
-////            printf("tl_stackBusy: %s,  zb_isTaskDone: %d\r\n", tl_stackBusy()?"true":"false", zb_isTaskDone());
-//            return TIMEOUT_1MIN;
-//        }
-//
-//#if UART_PRINTF_MODE && DEBUG_PM
-//        printf("Without network more then 30 minutes! Deep sleep ...\r\n");
-//#endif
-//
-//        drv_pm_wakeupPinLevelChange(pin_PmCfg, sizeof(pin_PmCfg)/sizeof(drv_pm_pinCfg_t));
-//
-//        apsCleanToStopSecondClock();
-//
-//        drv_disable_irq();
-//        rf_paShutDown();
-//        drv_pm_deepSleep_frameCnt_set(ss_outgoingFrameCntGet());
-//
-//        drv_pm_longSleep(PM_SLEEP_MODE_DEEPSLEEP, PM_WAKEUP_SRC_PAD, 1);
-//    }
-//
-//    g_appCtx.timerNoJoinedEvt = NULL;
-//    return -1;
-//}

@@ -36,11 +36,9 @@ endif
 
 ifeq ($(CHIP_FLASH_SIZE),512)
 	PFX_NAME = 512K
-	VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' ./src/include/version_cfg_512k.h)
 else
 	ifeq ($(CHIP_FLASH_SIZE),1024)
 		PFX_NAME = 1M
-		VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' ./src/include/version_cfg_1m.h)
 	else
 		PFX_NAME = UNKNOWN
 	endif

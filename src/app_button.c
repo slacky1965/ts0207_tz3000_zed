@@ -186,7 +186,7 @@ void button_handler(void) {
     }
 }
 
-u8 button_idle() {
+uint8_t button_idle() {
 
     if (g_appCtx.keyPressed) {
         return true;
