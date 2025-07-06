@@ -12,6 +12,8 @@
 
 <img src="doc/images/board2.jpg"/>
 
+<img src="doc/images/tlsr8258f1ket32.jpg"/>
+
 В `zigbee2mqtt` он определяется по разному, в зависимости от оригинальной прошивки, но по сути это одно и тоже устройство.
 
 <img src="doc/images/about_tz3000_k4ej3ww2_1m.jpg"/>
