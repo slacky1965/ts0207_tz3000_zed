@@ -8,6 +8,7 @@ BOARD_NAME ?= ZG_222Z
 
 BOARD_ZG_222Z  = 1
 BOARD_ZG_222ZA = 2
+BOARD_SNZB_05 = 3
 
 ifeq ($(BOARD_NAME),ZG_222ZA)
 	CHIP_FLASH_SIZE = 1024
@@ -17,8 +18,13 @@ else
 		CHIP_FLASH_SIZE = 512
 		BOARD = $(BOARD_ZG_222Z)
 	else
-		CHIP_FLASH_SIZE = 512
-		BOARD = $(BOARD_ZG_222Z)
+		ifeq ($(BOARD_NAME),SNZB_05)
+			CHIP_FLASH_SIZE = 512
+			BOARD = $(BOARD_SNZB_05)
+		else
+			CHIP_FLASH_SIZE = 512
+			BOARD = $(BOARD_ZG_222Z)
+		endif
 	endif
 endif
 
@@ -250,6 +256,20 @@ $(LST_FILE): $(ELF_FILE)
  #$(BOOT_FILE)
  
 ifeq ($(CHIP_FLASH_SIZE),512)
+ifeq ($(BOARD_NAME),SNZB_05)
+$(BIN_FILE): $(ELF_FILE)
+	@echo 'Create Flash image (binary format)'
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
+	@python3 $(TL_CHECK) $(BIN_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_FILE)
+	@echo ' '
+	@echo 'Create zigbee Tuya OTA file'
+	@python3 $(MAKE_OTA_TUYA) -m 4742 -t 514 -o $(BIN_PATH)/1286-0202-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(APPENDIX)
+	@echo ' '
+	@echo 'Finished building: $@'
+	@echo ' '
+else
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
@@ -259,15 +279,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
-	
-#	@echo 'Create zigbee Tuya OTA file'
-#	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(APPENDIX)
-#	@echo 'Copy $(BIN_FILE) to $(BIN_FILE)
-#$(BIN_PATH)/$(FIRMWARE_FILE)'
-#	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
-#$(BIN_PATH)/$(FIRMWARE_FILE)
-#$(BIN_PATH)/$(FIRMWARE_FILE)
-
+endif
 else
 ifeq ($(CHIP_FLASH_SIZE),1024)
 ifeq ($(CHECK_BL),1)
@@ -308,15 +320,19 @@ sizedummy: $(ELF_FILE)
 # Other Targets
 clean:
 	@echo $(INCLUDE_PATHS)
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_FILE)
-#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
 	-@echo ' '
+	
+# $(BIN_FILE)
+#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
 
 clean-project:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_FILE)
-#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-@echo ' '
+
+#	 $(BIN_FILE)
+#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 	
 pre-build:
 	mkdir -p $(foreach s,$(OUT_DIR),$(OUT_PATH)$(s))

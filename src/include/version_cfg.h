@@ -33,9 +33,10 @@
 
 #define BOARD_ZG_222Z                   1
 #define BOARD_ZG_222ZA                  2
+#define BOARD_SNZB_05                   3
 
 #ifndef BOARD
-#define BOARD                           BOARD_ZG_222Z
+#define BOARD                           BOARD_SNZB_05 //BOARD_ZG_222Z
 #endif
 
 #include "../common/comm_cfg.h"
@@ -50,6 +51,9 @@
 #elif (BOARD == BOARD_ZG_222ZA)
 #define IMAGE_TYPE_BOARD    17
 #define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
+#elif (BOARD == BOARD_SNZB_05)
+#define IMAGE_TYPE_BOARD    19
+#define ZCL_BASIC_MODEL_ID     {13,'S','N','Z','B','-','0','5','-','z','-','S','l','D'}
 #else
 #error BOARD must be defined
 #endif
@@ -59,11 +63,11 @@
 #endif
 
 #if (CHIP_FLASH_SIZE == 512)
-#include "version_cfg_512k.h"
+#define CHIP_TYPE                       TLSR_8258_512K
 #elif (CHIP_FLASH_SIZE == 1024)
-#include "version_cfg_1m.h"
+#define CHIP_TYPE                       TLSR_8258_1M
 #else
-#error CHIP_TYPE must be TLSR_8258_512K or TLSR_8258_1M
+#error CHIP_FLASH_SIZE must be 512 or 1024
 #endif
 
 #define APP_RELEASE                         0x10        //app release 1.0
@@ -122,6 +126,7 @@
  * 0x16 - Tuya Temperature and Humidity sensors ts0601_tze200 ZG-227Z
  * 0x17 - Tuya water leak sensor ZG-222ZA, ZTU or tlsr825x with 1M
  * 0x18 - Tuya water leak sensor ZG-222ZA, tlsr825x with 512K
+ * 0x19 - Tuya water leak sensor SNZB-05, tlsr8656 with 512K
  *
  */
 

@@ -110,6 +110,8 @@ extern "C" {
 #include "board_zg_222z.h"
 #elif (BOARD == BOARD_ZG_222ZA)
 #include "board_zg_222za.h"
+#elif (BOARD == BOARD_SNZB_05)
+#include "board_snzb_05.h"
 #else
 #error BOARD must be defined
 #endif

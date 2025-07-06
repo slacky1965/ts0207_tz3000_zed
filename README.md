@@ -2,21 +2,29 @@
 
 ### Custom firmware for Tuya sensor models
 
+**Не все датчики можно обновить через ОТА**.
+
+**Автор не несет никакой отвественности, если вы, воспользовавшись этим проектом, превратите свой умный датчик в полоумный.**
+
+> [!WARNING]
+> Внимание!!! Перед обновлением разбираем датчик и проверяем, что он изговотовлен именно на модуле ZTU или на чипе, как на фото ниже. Если у вас датчик не похож на те, что изображены на фото, лучше не заливать, большая вероятность получить кирпич. 
+
 - _TZ3000_k4ej3ww2
 - _TZ3000_kstbkt6a
+- _TZ3000_upgcbody
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/ts0207_tz3000.jpg"/>
+<img src="doc/images/ts0207_tz3000.jpg"/>
+
+
 
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board1.jpg"/>
 
+<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board2.jpg"/>
+
 <img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/about_orig.jpg"/>
 
-**Автор не несет никакой отвественности, если вы, воспользовавшись этим проектом, превратите свой умный датчик в полоумный.**
-
-> [!WARNING]
-> Внимание!!! Перед обновлением разбираем датчик и проверяем, что он изговотовлен именно на модуле ZTU или на чипе, как на фото вверху. Если у вас датчик не похож на те, что изображены на фото, лучше не заливать, большая вероятность получить кирпич.
 
 Проверялся только в zigbee2mqtt.
 

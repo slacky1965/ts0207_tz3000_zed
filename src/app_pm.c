@@ -10,7 +10,7 @@ static drv_pm_pinCfg_t pin_PmCfg[] = {
         WLEAK_GPIO,
 #if (BOARD == BOARD_ZG_222Z)
         PM_WAKEUP_LEVEL_LOW
-#elif (BOARD == BOARD_ZG_222ZA)
+#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
         PM_WAKEUP_LEVEL_HIGH
 #else
 #error BOARD must be defined
