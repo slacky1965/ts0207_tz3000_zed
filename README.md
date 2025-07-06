@@ -41,15 +41,15 @@
 
 **About**
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/about_zg_222za.jpg"/>
+<img src="doc/images/about_zg_222za.jpg"/>
 
 **Exposes**
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/exposes.jpg"/>
+<img src="doc/images/exposes.jpg"/>
 
 **Reporting**
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/reporting.jpg"/>
+<img src="doc/images/reporting.jpg"/>
 
 ## Как обновить.
 
@@ -74,17 +74,17 @@
 
 Для управление внешним устройством напрямую нужно сперва настроить биндинг. Это делается во вкладке `Bind` z2m. Выбираем Эндпоинт 1, затем выбираем устройство, которым хотим управлять, отмечаем кластер `OnOff`. Затем нажимаем кнопку на самом датчике, чтобы его разбудить и после жмем `Bind` в интерфейсе z2m. Система оповестит об успешном соединении или об ошибке.
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/binding1.jpg"/>
+<img src="doc/images/binding1.jpg"/>
 
 Если нужно закрыть не один кран, а несколько, то создаем еще одну прямую привязку к другому устройству. И т.д.
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/binding2.jpg"/>
+<img src="doc/images/binding2.jpg"/>
 
 ## Потребление
 
 В режиме ожидания протечки (измерялось - протечки нет на протяжении 10 часов) батарейки должно хватить минимум на 10 лет.
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/sleep_period_1hour.jpg"/>
+<img src="doc/images/sleep_period_1hour.jpg"/>
 
 ---
 
