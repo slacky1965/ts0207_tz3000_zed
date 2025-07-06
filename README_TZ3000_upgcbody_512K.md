@@ -9,6 +9,8 @@ _TZ3000_upgcbody
 
 <img src="doc/images/board3.jpg"/>
 
+<img src="doc/images/tlsr8656f512et32.jpg"/>
+
 В `zigbee2mqtt` он определяется вот так.
 
 <img src="doc/images/about_tz3000_upgcbody_512k.jpg"/>
