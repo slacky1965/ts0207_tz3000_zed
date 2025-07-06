@@ -23,11 +23,11 @@
 
 <img src="doc/images/board2.jpg"/>
 
-Если у вас датчик такой же, как на фото ниже, то вам **[сюда]()**
+Если у вас датчик такой же, как на фото ниже, то вам **[сюда]()** !!!Этот датчик нельзя обновить через ОТА!!!
 
 <img src="doc/images/board3.jpg"/>
 
-Если у вас датчик такой же, как на фото ниже, то вам **[сюда]()**
+Если у вас датчик такой же, как на фото ниже, то вам **[сюда](README_TZ3000_upgcbody_512K.md)**
 
 <img src="doc/images/board4.jpg"/>
 
@@ -41,7 +41,7 @@
 
 **About**
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/about.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/about_zg_222za.jpg"/>
 
 **Exposes**
 
