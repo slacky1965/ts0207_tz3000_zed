@@ -31,9 +31,6 @@
 
 <img src="doc/images/board4.jpg"/>
 
-<img src="doc/images/about_orig.jpg"/>
-
-
 Проверялся только в zigbee2mqtt.
 
 ## Зачем. 
