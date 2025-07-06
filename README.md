@@ -33,7 +33,7 @@
 
 <img src="doc/images/board4.jpg"/>
 
-Проверялся только в zigbee2mqtt.
+Проверялся только в `zigbee2mqtt`.
 
 ## Зачем. 
 
