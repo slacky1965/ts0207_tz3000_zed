@@ -1,29 +1,37 @@
 # <a id="Top">Tuya Water Leak Sensor Zigbee with custom firmware</a>
 
-### Custom firmware for Tuya sensor models
+## Custom firmware for Tuya sensor models
 
-**Не все датчики можно обновить через ОТА**.
+### Не все датчики можно обновить через ОТА.
 
 **Автор не несет никакой отвественности, если вы, воспользовавшись этим проектом, превратите свой умный датчик в полоумный.**
 
 > [!WARNING]
 > Внимание!!! Перед обновлением разбираем датчик и проверяем, что он изговотовлен именно на модуле ZTU или на чипе, как на фото ниже. Если у вас датчик не похож на те, что изображены на фото, лучше не заливать, большая вероятность получить кирпич. 
 
-- _TZ3000_k4ej3ww2
+- _TZ3000_k4ej3ww2 (есть две версии, с 1М флеш и с 512К !!!)
 - _TZ3000_kstbkt6a
 - _TZ3000_upgcbody
 
 <img src="doc/images/ts0207_tz3000.jpg"/>
 
+<a id="Begin" /a>
 
+Если у вас датчик такой же, как на одной из двух фото ниже, то вам **[сюда](README_TZ3000_k4ej3ww2_1M.md)**
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board.jpg"/>
+<img src="doc/images/board1.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board1.jpg"/>
+<img src="doc/images/board2.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/board2.jpg"/>
+Если у вас датчик такой же, как на фото ниже, то вам **[сюда]()**
 
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/about_orig.jpg"/>
+<img src="doc/images/board3.jpg"/>
+
+Если у вас датчик такой же, как на фото ниже, то вам **[сюда]()**
+
+<img src="doc/images/board4.jpg"/>
+
+<img src="doc/images/about_orig.jpg"/>
 
 
 Проверялся только в zigbee2mqtt.
@@ -48,50 +56,7 @@
 
 ## Как обновить.
 
-Сначала подключаем к z2m один внешний [конвертор](https://github.com/slacky1965/ts0207_tz3000_zed/tree/main/zigbee2mqtt) `zg_222za_orig.js`. Он активирует OTA в z2m для датчика с прошивкой от Tuya.
-
-Далее нужно добавить локальное хранилище обновлений. 
-
-Создаем директорию `images` в директории z2m и кладем туда файл [1141-d3a3-1111114b-ts0207_tz3000_zrd.zigbee](https://github.com/slacky1965/ts0207_tz3000_zed/raw/refs/heads/main/bin/1141-d3a3-1111114b-ts0207_tz3000_zrd.zigbee).
-
-Копируем в директорию z2m файл [local_ota_index.json](https://github.com/slacky1965/ts0207_tz3000_zed/blob/main/zigbee2mqtt/local_ota_index.json)
-
-В конфиг z2m `configuration.yaml` добавляем локальное хранилище
-
-```
-ota:
-  zigbee_ota_override_index_location: local_ota_index.json
-```
-
-А конвертор `zg_222za_orig.js` кладем в директорию `external_converters`, которую нужно создать в корне z2m.
-
-Далее перегружаем z2m. И видим у нас новое устройство.
-
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/tuya_ready.jpg"/>
-
-Далее идем в раздел OTA. И видим там свое устройство. Будим датчик, нажимая на его кнопку и только потом жмем проверить обновления.
-
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/update.jpg"/>
-	
-Жмем на появившуюся красную кнопку. И обновляемся.
-
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/update2.jpg"/>
-	
-Если все не так, как описано, значит вы что-то сделали не по инструкции (не положили файл куда нужно, не перегрузили z2m) или сигнатуры вашего датчика нет в списке поддерживаемых устройств.
-
-> [!WARNING]
-> Внимание!!! Если в процессе вы обнаружите на каких-то устройствах Туя, которые возможно у вас есть еще в системе, новое обновление, то обновлять ничего не нужно!!! Иначе вы зальете в это устройство прошивку от датчика и получите кирпич!!! Если же процесс обновления по ошибке уже начался, то просто обесточьте это устройство!!!
-
-Далее ждем окончания.
-
-После обновления нужно удалить устройство из z2m. Перегрузить z2m. Разрешить сопряжение. Зажать кнопку на 5 секунд, пока светодиод не начнет моргать и отпустить. Начнется сопряжение.
-
-<img src="https://raw.githubusercontent.com/slacky1965/ts0207_tz3000_zed/refs/heads/main/doc/images/joined.jpg"/>
-
-Все, датчик готов к работе.
-
-> [!WARNING]
-> Внимание!!! Залитая первый раз прошивка является промежуточной. В ней есть код для проверки `bootloader'а`, который несет потенциальную угрозу порчи этого `bootloader'a` в будущем. Поэтому нужно обновиться еще раз уже на окончательную версию, где этот код не используется. Сразу сделать без этой проверки нельзя (привет Tuya). Для понимания - промежуточная версия имеет номер 1.0.00. Процесс обновления ОТА достаточно энергозатратный, поэтому или нужно запастись батарейками, или подключить датчик к внешнему 3-х вольтовому источнику питания.
+[Идем в описание для конкретного датчика](#Begin)
 
 ## Логика работы устройства.
 
