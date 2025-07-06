@@ -15,7 +15,7 @@
 
 <img src="doc/images/ts0207_tz3000.jpg"/>
 
-<a id="Begin" /a>
+<a id="Begin"></a>
 
 Если у вас датчик такой же, как на одной из двух фото ниже, то вам **[сюда](README_TZ3000_k4ej3ww2_1M.md)**
 
