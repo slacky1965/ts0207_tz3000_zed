@@ -86,6 +86,12 @@ int32_t check_sleepCb(void *args) {
 
     if (zb_getLocalShortAddr() < 0xFFF8) {
 
+        if (g_appCtx.ota) {
+            printf("check_sleepCb - OTA\r\n");
+            g_appCtx.timerCheckSleepEvt = NULL;
+            return -1;
+        }
+
         printf("check_sleepCb - reset\r\n");
         sleep_ms(250);
 

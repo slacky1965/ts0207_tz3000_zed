@@ -54,6 +54,7 @@ typedef struct {
 
     bool leak;
     bool not_sleep;
+    bool ota;
     analog_reg_t analog_reg;
 
     bool net_steer_start;

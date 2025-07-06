@@ -340,6 +340,7 @@ void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
 #endif /* UART_PRINTF_MODE */
             zb_setPollRate(QUEUE_POLL_RATE);
             g_appCtx.not_sleep = true;
+            g_appCtx.ota = true;
             if (g_appCtx.timerSetPollRateEvt) {
                 TL_ZB_TIMER_CANCEL(&g_appCtx.timerSetPollRateEvt);
             }

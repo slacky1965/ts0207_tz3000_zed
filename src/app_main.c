@@ -10,11 +10,11 @@ app_ctx_t g_appCtx = {
         .timerCheckSleepEvt = NULL,
         .timerSetPollRateEvt = NULL,
         .oriSta = false,
-//        .time_without_joined = 0,
         .net_steer_start = false,
         .read_sensor_time = 0,
         .leak = 0,
         .not_sleep = true,
+        .ota = false,
 };
 
 //uint32_t count_restart = 0;
