@@ -2,6 +2,7 @@ const {identify, reporting, ota} = require('zigbee-herdsman-converters/lib/moder
 
 const definition = {
     fingerprint: [{manufacturerName: '_TZ3000_k4ej3ww2'},
+                  {manufacturerName: '_TZ3000_kstbkt6a'},
                   {manufacturerName: '_TZ3000_upgcbody'}
                  ],
     zigbeeModel: ['TS0207', 'SNZB-05'],
