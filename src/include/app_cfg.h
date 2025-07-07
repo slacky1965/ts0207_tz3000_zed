@@ -35,9 +35,9 @@ extern "C" {
 #define ON                      1
 #define OFF                     0
 
-#ifndef MCU_CORE_8258
-#define MCU_CORE_8258   1
-#endif
+//#ifndef MCU_CORE_8258
+//#define MCU_CORE_8258   1
+//#endif
 
 /* for reporting */
 #define REPORTING_MIN           10              /* 10 sec                   */
@@ -49,22 +49,9 @@ extern "C" {
 #define LONG_POLL           REPORTING_MIN
 #define TIMEOUT_NET         TIMEOUT_30MIN
 
-/**********************************************************************
- * Product Information
- */
-
-#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
-#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
-
-
-/**********************************************************************
- * Version configuration
- */
-#include "version_cfg.h"
-
 /* Debug mode config */
-#define	UART_PRINTF_MODE                ON
-#define USB_PRINTF_MODE         		OFF
+#define UART_PRINTF_MODE                ON
+#define USB_PRINTF_MODE                 OFF
 
 #define DEBUG_BUTTON                    ON
 #define DEBUG_REPORTING                 OFF
@@ -74,6 +61,12 @@ extern "C" {
 #define DEBUG_LEAK                      OFF
 #define DEBUG_STA_STATUS                OFF
 #define DEBUG_ONOFF                     ON
+
+/**********************************************************************
+ * Version configuration
+ */
+#include "version_cfg.h"
+
 /* PM */
 #define PM_ENABLE						ON
 
@@ -84,18 +77,6 @@ extern "C" {
 #define TOUCHLINK_SUPPORT				ON
 #define FIND_AND_BIND_SUPPORT			OFF
 
-/* Board ID */
-#define BOARD_826x_EVK                  0
-#define BOARD_826x_DONGLE               1
-#define BOARD_826x_DONGLE_PA            2
-#define BOARD_8258_EVK                  3
-#define BOARD_8258_EVK_V1P2             4//C1T139A30_V1.2
-#define BOARD_8258_DONGLE               5
-#define BOARD_8278_EVK                  6
-#define BOARD_8278_DONGLE               7
-#define BOARD_B91_EVK                   8
-#define BOARD_B91_DONGLE                9
-#define BOARD_TS0207_TZ3000             10
 
 /* Board define */
 #if defined(MCU_CORE_826x)
@@ -109,7 +90,7 @@ extern "C" {
 #if (CHIP_TYPE == TLSR_8258_1M)
     #define FLASH_CAP_SIZE_1M           1
 #endif
-    #define BOARD                       BOARD_TS0207_TZ3000
+//    #define BOARD                       BOARD_ZG_222ZA
     #define CLOCK_SYS_CLOCK_HZ          48000000
     #define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
 #elif defined(MCU_CORE_8278)
@@ -125,30 +106,15 @@ extern "C" {
 #endif
 
 /* Board include */
-#if (BOARD == BOARD_826x_EVK)
-    #include "board_826x_evk.h"
-#elif (BOARD == BOARD_826x_DONGLE)
-    #include "board_826x_dongle.h"
-#elif (BOARD == BOARD_826x_DONGLE_PA)
-    #include "board_826x_dongle_pa.h"
-#elif (BOARD == BOARD_8258_DONGLE)
-    #include "board_8258_dongle.h"
-#elif (BOARD == BOARD_8258_EVK)
-    #include "board_8258_evk.h"
-#elif (BOARD == BOARD_8258_EVK_V1P2)
-    #include "board_8258_evk_v1p2.h"
-#elif (BOARD == BOARD_8278_EVK)
-    #include "board_8278_evk.h"
-#elif (BOARD == BOARD_8278_DONGLE)
-    #include "board_8278_dongle.h"
-#elif (BOARD == BOARD_B91_EVK)
-    #include "board_b91_evk.h"
-#elif (BOARD == BOARD_B91_DONGLE)
-    #include "board_b91_dongle.h"
-#elif (BOARD == BOARD_TS0207_TZ3000)
-    #include "board_ts0207_tz3000.h"
+#if (BOARD == BOARD_ZG_222Z)
+#include "board_zg_222z.h"
+#elif (BOARD == BOARD_ZG_222ZA)
+#include "board_zg_222za.h"
+#elif (BOARD == BOARD_SNZB_05)
+#include "board_snzb_05.h"
+#else
+#error BOARD must be defined
 #endif
-
 
 /* Voltage detect module */
 /* If VOLTAGE_DETECT_ENABLE is set,

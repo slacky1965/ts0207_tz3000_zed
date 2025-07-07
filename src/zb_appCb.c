@@ -272,14 +272,6 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg) {
             if (!switchRejoinBackoffTimerEvt) {
                 switchRejoinBackoffTimerEvt = TL_ZB_TIMER_SCHEDULE(app_rejoinBacckoff, NULL, 60 * 1000);
             }
-//#if PM_ENABLE
-//            if (!g_appCtx.timerNoJoinedEvt) {
-//                g_appCtx.timerNoJoinedEvt = TL_ZB_TIMER_SCHEDULE(no_joinedCb, NULL, TIMEOUT_NET);
-//#if UART_PRINTF_MODE && DEBUG_STA_STATUS
-//                printf("Not joined, status: %s (%d)\r\n", bdb_commission_sta_status[status], status);
-//#endif /* UART_PRINTF_MODE */
-//            }
-//#endif
             break;
         default:
             break;
@@ -348,6 +340,7 @@ void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
 #endif /* UART_PRINTF_MODE */
             zb_setPollRate(QUEUE_POLL_RATE);
             g_appCtx.not_sleep = true;
+            g_appCtx.ota = true;
             if (g_appCtx.timerSetPollRateEvt) {
                 TL_ZB_TIMER_CANCEL(&g_appCtx.timerSetPollRateEvt);
             }

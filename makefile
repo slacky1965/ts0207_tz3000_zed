@@ -4,7 +4,51 @@ PROJECT_NAME := ts0207_tz3000_zed
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
-COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+BOARD_NAME ?= ZG_222Z
+
+BOARD_ZG_222Z  = 1
+BOARD_ZG_222ZA = 2
+BOARD_SNZB_05 = 3
+
+ifeq ($(BOARD_NAME),ZG_222ZA)
+	CHIP_FLASH_SIZE = 1024
+	BOARD = $(BOARD_ZG_222ZA)
+else
+	ifeq ($(BOARD_NAME),ZG_222Z)
+		CHIP_FLASH_SIZE = 512
+		BOARD = $(BOARD_ZG_222Z)
+	else
+		ifeq ($(BOARD_NAME),SNZB_05)
+			CHIP_FLASH_SIZE = 512
+			BOARD = $(BOARD_SNZB_05)
+		else
+			CHIP_FLASH_SIZE = 512
+			BOARD = $(BOARD_ZG_222Z)
+		endif
+	endif
+endif
+
+
+
+COMPILE_OS = $(shell uname -o)
+LINUX_OS = GNU/Linux
+
+ifeq ($(COMPILE_OS),$(LINUX_OS))	
+	COMPILE_PREFIX = /opt/tc32/bin/tc32
+else
+	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+	WIN32 = -DWIN32=1
+endif
+
+ifeq ($(CHIP_FLASH_SIZE),512)
+	PFX_NAME = 512K
+else
+	ifeq ($(CHIP_FLASH_SIZE),1024)
+		PFX_NAME = 1M
+	else
+		PFX_NAME = UNKNOWN
+	endif
+endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
 CC      = $(COMPILE_PREFIX)-elf-gcc
@@ -19,7 +63,7 @@ LIBS := -lzb_ed -ldrivers_8258
 
 DEVICE_TYPE = -DEND_DEVICE=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE) -DBOARD=$(BOARD)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -89,7 +133,10 @@ endif
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
--DBOOT_SIZE=$(BOOT_SIZE)
+-DBOOT_SIZE=$(BOOT_SIZE) \
+-DBOARD=$(BOARD) \
+-DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
+
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -126,11 +173,16 @@ RM := rm -rf
 -include ./project.mk
 
 # Add inputs and outputs from these tool invocations to the build variables 
-LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
-BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
-ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
-FW_FILE  := $(OUT_PATH)/firmware.bin
-BOOT_FILE := $(OUT_PATH)/bootloader.bin
+LOWER_NAME := $(shell echo $(BOARD_NAME) | tr [:upper:] [:lower:])
+FIRMWARE_NAME := $(LOWER_NAME)_$(PFX_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD)
+FIRMWARE_FILE := $(FIRMWARE_NAME).bin
+BOOT_FILE := $(BIN_PATH)/bootloader_$(PFX_NAME).bin
+APPENDIX := $(BIN_PATH)/marker.bin
+LST_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).lst
+BIN_FILE := $(BIN_PATH)/$(FIRMWARE_NAME).bin 
+#$(OUT_PATH)/$(PROJECT_NAME).bin
+ELF_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).elf
+
 
 SIZEDUMMY += \
 sizedummy \
@@ -142,10 +194,16 @@ all: pre-build main-build
 flash: $(BIN_FILE)
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
 
+flash-512k: $(BIN_FILE)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_FILE)
+
 flash-orig-write:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_PATH)/ts0207_tz3000_orig.bin
 	
-flash-orig-read:
+flash-orig-read-512k:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x80000 ts0207_tz3000_orig.bin
+	
+flash-orig-read-1m:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x100000 ts0207_tz3000_orig.bin
 	
 flash-orig-bootloader-read:
@@ -169,9 +227,6 @@ erase-flash-macaddr:
 
 flash-bootloader:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOTLOADER)
-	
-flash-ota:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x70000 $(FW_FILE)
 	
 test-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -s i
@@ -200,14 +255,20 @@ $(LST_FILE): $(ELF_FILE)
 	$(OBJDUMP) -x -D -l -S $(ELF_FILE)  > $(LST_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
-	
-ifeq ($(CHECK_BL),1)
+
+ #$(BOOT_FILE)
+ 
+ifeq ($(CHIP_FLASH_SIZE),512)
+ifeq ($(BOARD_NAME),SNZB_05)
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_FILE)
+	@echo ' '
 	@echo 'Create zigbee Tuya OTA file'
-	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-ts0207_tz3000_zrd.zigbee $(BIN_FILE) $(BOOT_FILE)
+	@python3 $(MAKE_OTA_TUYA) -m 4742 -t 514 -o $(BIN_PATH)/1286-0202-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(APPENDIX)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
@@ -216,14 +277,39 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@cat $(BIN_FILE) $(BOOT_FILE) > $(FW_FILE)
-	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
-	@echo 'Create zigbee OTA file'
-	@python3 $(MAKE_OTA) -ot $(PROJECT_NAME) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
 endif
+else
+ifeq ($(CHIP_FLASH_SIZE),1024)
+ifeq ($(CHECK_BL),1)
+$(BIN_FILE): $(ELF_FILE)
+	@echo 'Create Flash image (binary format)'
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
+	@python3 $(TL_CHECK) $(BIN_FILE)
+	@echo 'Create zigbee Tuya OTA file'
+	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(BOOT_FILE)
+	@rm $(BIN_FILE)
+	@echo ' '
+	@echo 'Finished building: $@'
+	@echo ' '
+else
+$(BIN_FILE): $(ELF_FILE)
+	@echo 'Create Flash image (binary format)'
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
+	@python3 $(TL_CHECK) $(BIN_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
+	@python3 $(MAKE_OTA) -ot $(BOARD_NAME) $(BIN_FILE)
+	@echo ' '
+	@echo 'Finished building: $@'
+	@echo ' '
+endif
+endif
+endif
+	
 
 #$(OBJ_DIR)/bin_updater.o: $(OBJ_DIR)
 #    @objcopy -I binary --output-target elf32-littlearm --rename-section .data=.bin_files ./updater.bin $@	 
@@ -237,13 +323,19 @@ sizedummy: $(ELF_FILE)
 # Other Targets
 clean:
 	@echo $(INCLUDE_PATHS)
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
 	-@echo ' '
+	
+# $(BIN_FILE)
+#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
 
 clean-project:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-@echo ' '
+
+#	 $(BIN_FILE)
+#/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 	
 pre-build:
 	mkdir -p $(foreach s,$(OUT_DIR),$(OUT_PATH)$(s))

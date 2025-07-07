@@ -8,7 +8,13 @@
 static drv_pm_pinCfg_t pin_PmCfg[] = {
     {
         WLEAK_GPIO,
-        PM_WAKEUP_LEVEL_HIGH //PM_WAKEUP_LEVEL
+#if (BOARD == BOARD_ZG_222Z)
+        PM_WAKEUP_LEVEL_LOW
+#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
+        PM_WAKEUP_LEVEL_HIGH
+#else
+#error BOARD must be defined
+#endif
     },
     {
         BUTTON1,
@@ -74,4 +80,34 @@ void app_set_analog_reg(uint8_t *reg_data) {
 
 uint8_t app_get_analog_reg() {
     return analog_read(APP_ANALOG_REG);
+}
+
+int32_t check_sleepCb(void *args) {
+
+    if (zb_getLocalShortAddr() < 0xFFF8) {
+
+        if (g_appCtx.ota) {
+            printf("check_sleepCb - OTA\r\n");
+            g_appCtx.timerCheckSleepEvt = NULL;
+            return -1;
+        }
+
+        printf("check_sleepCb - reset\r\n");
+        sleep_ms(250);
+
+        zb_resetDevice();
+        return -1;
+    }
+
+//    if (zb_isDeviceJoinedNwk()) {
+//
+//        printf("check_sleepCb - reset\r\n");
+//        sleep_ms(250);
+//
+//        zb_resetDevice();
+//        return -1;
+//    }
+
+    printf("check_sleepCb - no joined\r\n");
+    return 0;
 }

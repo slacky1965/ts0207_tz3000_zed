@@ -37,7 +37,7 @@ typedef struct {
     ev_timer_event_t *timerSetPollRateEvt;
     ev_timer_event_t *timerBatteryEvt;
     ev_timer_event_t *timerLedEvt;
-    ev_timer_event_t *timerNoJoinedEvt;
+    ev_timer_event_t *timerCheckSleepEvt;
 
     button_t button[MAX_BUTTON_NUM];
     u8  keyPressed;
@@ -54,6 +54,7 @@ typedef struct {
 
     bool leak;
     bool not_sleep;
+    bool ota;
     analog_reg_t analog_reg;
 
     bool net_steer_start;

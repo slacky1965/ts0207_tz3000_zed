@@ -25,11 +25,54 @@
 
 #pragma once
 
+#ifndef MCU_CORE_8258
+#define MCU_CORE_8258   1
+#endif
+
+/* Board ID */
+
+#define BOARD_ZG_222Z                   1
+#define BOARD_ZG_222ZA                  2
+#define BOARD_SNZB_05                   3
+
+#ifndef BOARD
+#define BOARD                           BOARD_SNZB_05 //BOARD_ZG_222Z
+#endif
+
 #include "../common/comm_cfg.h"
+
+/**********************************************************************
+ * Product Information
+ */
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#if (BOARD == BOARD_ZG_222Z)
+#define IMAGE_TYPE_BOARD    18
+#define ZCL_BASIC_MODEL_ID     {13,'Z','G','-','2','2','2','Z','-','z','-','S','l','D'}
+#elif (BOARD == BOARD_ZG_222ZA)
+#define IMAGE_TYPE_BOARD    17
+#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
+#elif (BOARD == BOARD_SNZB_05)
+#define IMAGE_TYPE_BOARD    19
+#define ZCL_BASIC_MODEL_ID     {13,'S','N','Z','B','-','0','5','-','z','-','S','l','D'}
+#else
+#error BOARD must be defined
+#endif
+
+#ifndef CHIP_FLASH_SIZE
+#define CHIP_FLASH_SIZE 512
+#endif
+
+#if (CHIP_FLASH_SIZE == 512)
+#define CHIP_TYPE                       TLSR_8258_512K
+#elif (CHIP_FLASH_SIZE == 1024)
+#define CHIP_TYPE                       TLSR_8258_1M
+#else
+#error CHIP_FLASH_SIZE must be 512 or 1024
+#endif
 
 #define APP_RELEASE                         0x10        //app release 1.0
 #ifndef VERSION_BUILD
-    #define APP_BUILD                       0x02        //app build 02, full version - v1.0.02
+    #define APP_BUILD                       0x03        //app build 02, full version - v1.0.02
 #endif
 
 #define STACK_RELEASE                       0x30        //stack release 3.0
@@ -81,11 +124,13 @@
  * 0x14 - Air monitor
  * 0x15 - Tuya Temperature and Humidity sensors ts0201_tz3000
  * 0x16 - Tuya Temperature and Humidity sensors ts0601_tze200 ZG-227Z
- * 0x17 - Tuya water leak sensor ZG-222ZA
+ * 0x17 - Tuya water leak sensor ZG-222ZA, ZTU or tlsr825x with 1M
+ * 0x18 - Tuya water leak sensor ZG-222ZA, tlsr825x with 512K
+ * 0x19 - Tuya water leak sensor SNZB-05, tlsr8656 with 512K
  *
  */
 
-#define IMAGE_TYPE_APP              (0x17 | (IMAGE_TYPE_BOOT_FLAG << 7))
+#define IMAGE_TYPE_APP              (IMAGE_TYPE_BOARD | (IMAGE_TYPE_BOOT_FLAG << 7))
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
