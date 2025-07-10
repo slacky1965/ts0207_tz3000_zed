@@ -119,7 +119,7 @@ void waterleak_handler() {
             app_setPollRate(TIMEOUT_20SEC);
 
             if (!reset_leak)
-                timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_500MS);
+                timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
 
             g_appCtx.leak = true;
             waterleak_count = 0;
