@@ -13,10 +13,12 @@
 /* for TL_ZB_TIMER_SCHEDULE() */
 #define TIMEOUT_10MS               10       /* timeout 10  ms   */
 #define TIMEOUT_100MS              100      /* timeout 100 ms   */
+#define TIMEOUT_200MS              200      /* timeout 200 ms   */
 #define TIMEOUT_250MS              250      /* timeout 250 ms   */
-#define TIMEOUT_500MS              500      /* timeout 900 ms   */
+#define TIMEOUT_500MS              500      /* timeout 500 ms   */
+#define TIMEOUT_700MS              700      /* timeout 700 ms   */
 #define TIMEOUT_900MS              900      /* timeout 900 ms   */
-#define TIMEOUT_1SEC        1    * 1000     /* timeout 1 sec    */
+#define TIMEOUT_1SEC               1000     /* timeout 1 sec    */
 #define TIMEOUT_2SEC        2    * 1000     /* timeout 2 sec    */
 #define TIMEOUT_3SEC        3    * 1000     /* timeout 3 sec    */
 #define TIMEOUT_4SEC        4    * 1000     /* timeout 4 sec    */
