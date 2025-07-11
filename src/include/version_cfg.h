@@ -36,7 +36,7 @@
 #define BOARD_SNZB_05                   3
 
 #ifndef BOARD
-#define BOARD                           BOARD_SNZB_05 //BOARD_ZG_222Z
+#define BOARD                           BOARD_ZG_222ZA //BOARD_SNZB_05 //
 #endif
 
 #include "../common/comm_cfg.h"
@@ -46,13 +46,13 @@
  */
 #define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
 #if (BOARD == BOARD_ZG_222Z)
-#define IMAGE_TYPE_BOARD    18
+#define IMAGE_TYPE_BOARD    0x18
 #define ZCL_BASIC_MODEL_ID     {13,'Z','G','-','2','2','2','Z','-','z','-','S','l','D'}
 #elif (BOARD == BOARD_ZG_222ZA)
-#define IMAGE_TYPE_BOARD    17
+#define IMAGE_TYPE_BOARD    0x17
 #define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
 #elif (BOARD == BOARD_SNZB_05)
-#define IMAGE_TYPE_BOARD    19
+#define IMAGE_TYPE_BOARD    0x19
 #define ZCL_BASIC_MODEL_ID     {13,'S','N','Z','B','-','0','5','-','z','-','S','l','D'}
 #else
 #error BOARD must be defined
