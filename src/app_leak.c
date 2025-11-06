@@ -1,12 +1,14 @@
 #include "app_main.h"
 
-#define WATERLEAK_COUNT_MAX  16
+#define WATERLEAK_COUNT_MAX 16
+#define WATERLEAK_OPER      5
 
 static uint8_t waterleak_count = 0;
 static uint8_t no_waterleak_count = 0;
 static uint32_t check_rejoin = 0;
 static uint8_t first_start = 1;
 static bool reset_leak = false;
+static uint8_t waterleak_oper = 0;
 static ev_timer_event_t *timerResetLeakEvt = NULL;
 
 void fillIASAddress(epInfo_t* pdstEpInfo) {
@@ -34,7 +36,12 @@ static int32_t reset_leakTimerCb() {
 
     g_appCtx.leak = false;
 
-    reset_leak = true;
+    if (waterleak_oper > WATERLEAK_OPER) {
+        reset_leak = true;
+        waterleak_oper = 0;
+    } else {
+        waterleak_oper++;
+    }
 
     timerResetLeakEvt = NULL;
     return -1;
@@ -65,13 +72,7 @@ void waterleak_handler() {
         return;
     }
 
-//#if (BOARD == BOARD_ZG_222Z)
-//    if (!drv_gpio_read(WLEAK_GPIO)) {
-//#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
       if (drv_gpio_read(WLEAK1) || !drv_gpio_read(WLEAK2)) {
-//#else
-//#error BOARD must be defined
-//#endif
 
         no_waterleak_count = 0;
 
@@ -118,8 +119,12 @@ void waterleak_handler() {
 
             app_setPollRate(TIMEOUT_20SEC);
 
-            if (!reset_leak)
+            if (!reset_leak && waterleak_oper < WATERLEAK_OPER) {
+                if (timerResetLeakEvt) TL_ZB_TIMER_CANCEL(&timerResetLeakEvt);
                 timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
+            }
+
+            printf("waterleak_oper: %d\r\n", waterleak_oper);
 
             g_appCtx.leak = true;
             waterleak_count = 0;
@@ -138,6 +143,7 @@ void waterleak_handler() {
             g_appCtx.leak = false;
             no_waterleak_count = 0;
             reset_leak = false;
+            waterleak_oper = 0;
             if (timerResetLeakEvt)
                 TL_ZB_TIMER_CANCEL(&timerResetLeakEvt);
 

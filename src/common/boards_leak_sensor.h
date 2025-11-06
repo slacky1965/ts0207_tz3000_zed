@@ -38,7 +38,7 @@ extern "C" {
 /************************* Configure LEAK GPIO **************************************/
 
 /* board zg_222za and snzb_05 */
-#define WLEAK1              GPIO_PD7
+#define WLEAK1                  GPIO_PD7
 #define PD7_INPUT_ENABLE        ON
 #define PD7_DATA_OUT            OFF
 #define PD7_OUTPUT_ENABLE       OFF
@@ -46,7 +46,7 @@ extern "C" {
 #define PULL_WAKEUP_SRC_PD7     PM_PIN_PULLDOWN_100K //PM_PIN_PULLUP_1M
 
 /* board zg_222z */
-#define WLEAK2              GPIO_PB6
+#define WLEAK2                  GPIO_PB6
 #define PB6_INPUT_ENABLE        ON
 #define PB6_DATA_OUT            OFF
 #define PB6_OUTPUT_ENABLE       OFF

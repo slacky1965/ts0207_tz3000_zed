@@ -162,11 +162,11 @@ void user_app_init(void)
 
     if (g_appCtx.analog_reg.deep_sleep) {
         g_appCtx.leak = g_appCtx.analog_reg.leak;
+    } else {
+        g_appCtx.analog_reg.deep_sleep = 1;
+        g_appCtx.analog_reg.leak = 0;
+        app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
     }
-
-    g_appCtx.analog_reg.deep_sleep = 0;
-    g_appCtx.analog_reg.leak = 0;
-    app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
 
     batteryCb(NULL);
 

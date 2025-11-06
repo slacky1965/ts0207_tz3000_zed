@@ -1,7 +1,7 @@
 #ifndef SRC_INCLUDE_APP_PM_H_
 #define SRC_INCLUDE_APP_PM_H_
 
-#define APP_ANALOG_REG          DEEP_ANA_REG1   // analog register
+#define APP_ANALOG_REG          DEEP_ANA_REG7 //DEEP_ANA_REG1   // analog register
 #define TIME_LONG_DEEP_SLEEP    3600             // Time of long deep sleep in sec. 3600
 
 #if PM_ENABLE

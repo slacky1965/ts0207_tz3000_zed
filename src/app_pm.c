@@ -67,7 +67,7 @@ void app_lowPowerEnter() {
     drv_pm_deepSleep_frameCnt_set(ss_outgoingFrameCntGet());
 
     g_appCtx.analog_reg.leak = g_appCtx.leak;
-    g_appCtx.analog_reg.deep_sleep = 1;
+//    g_appCtx.analog_reg.deep_sleep = 1;
 
     app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
 
