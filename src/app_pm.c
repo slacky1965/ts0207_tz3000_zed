@@ -7,17 +7,23 @@
 
 static drv_pm_pinCfg_t pin_PmCfg[] = {
     {
-        WLEAK_GPIO,
-#if (BOARD == BOARD_ZG_222Z)
-        PM_WAKEUP_LEVEL_LOW
-#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
+        WLEAK1,
         PM_WAKEUP_LEVEL_HIGH
-#else
-#error BOARD must be defined
-#endif
+    },
+    {
+        WLEAK2,
+        PM_WAKEUP_LEVEL_LOW
     },
     {
         BUTTON1,
+        PM_WAKEUP_LEVEL
+    },
+    {
+        BUTTON2,
+        PM_WAKEUP_LEVEL
+    },
+    {
+        BUTTON3,
         PM_WAKEUP_LEVEL
     },
 };
@@ -28,7 +34,7 @@ void app_wakeupPinConfig() {
 
 
 void app_wakeupPinLevelChange() {
-    drv_pm_wakeupPinLevelChange(pin_PmCfg, 1);
+    drv_pm_wakeupPinLevelChange(pin_PmCfg, 2);
 }
 
 void app_lowPowerEnter() {

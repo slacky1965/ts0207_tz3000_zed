@@ -47,15 +47,7 @@
  *
  * Normal mode is used by default.
  */
-
-#if (CHIP_FLASH_SIZE == 512)
-#define BOOT_LOADER_MODE                    0
-#elif (CHIP_FLASH_SIZE == 1024)
-#define BOOT_LOADER_MODE                    1
-#else
-#error CHIP_FLASH_SIZE must be 512 or 1024
-#endif
-
+#define BOOT_LOADER_MODE					0
 
 
 
@@ -89,4 +81,22 @@
 #define IMAGE_TYPE_LIGHT					(0x01 | (IMAGE_TYPE_BOOT_FLAG << 7))
 #define IMAGE_TYPE_SWITCH					(0x02 | (IMAGE_TYPE_BOOT_FLAG << 7))
 #define IMAGE_TYPE_CONTACT_SENSOR			(0x03 | (IMAGE_TYPE_BOOT_FLAG << 7))
+
+#ifndef MCU_CORE_8258
+#define MCU_CORE_8258   1
+#endif
+
+#if defined(MCU_CORE_826x)
+    #if (CHIP_8269)
+        #define CHIP_TYPE                   TLSR_8269
+    #else
+        #define CHIP_TYPE                   TLSR_8267
+    #endif
+#elif defined(MCU_CORE_8258)
+        #define CHIP_TYPE                   TLSR_8258_512K //TLSR_8258_1M //
+#elif defined(MCU_CORE_8278)
+        #define CHIP_TYPE                   TLSR_8278
+#elif defined(MCU_CORE_B91)
+        #define CHIP_TYPE                   TLSR_B91
+#endif
 

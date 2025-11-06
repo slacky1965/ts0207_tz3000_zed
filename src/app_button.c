@@ -16,7 +16,7 @@ static void buttonKeepPressed(u8 btNum) {
     g_appCtx.button[btNum-1].state = APP_FACTORY_NEW_DOING;
     g_appCtx.button[btNum-1].ctn = 0;
 
-    if(btNum == VK_SW1) {
+    if(btNum == VK_SW1 || btNum == VK_SW2 || btNum == VK_SW3) {
 #if UART_PRINTF_MODE && DEBUG_BUTTON
         printf("The button was keep pressed for 5 seconds\r\n");
 #endif
@@ -53,6 +53,8 @@ static void buttonSinglePressed(u8 btNum) {
 
     switch (btNum) {
         case VK_SW1:
+        case VK_SW2:
+        case VK_SW3:
 #if UART_PRINTF_MODE && DEBUG_BUTTON
             printf("Button push 1 time\r\n");
 #endif

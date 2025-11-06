@@ -11,6 +11,7 @@ ifeq ($(COMPILE_OS),$(LINUX_OS))
 	COMPILE_PREFIX = /opt/tc32/bin/tc32
 else
 	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+	WIN32 = -DWIN32=1
 endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
@@ -23,7 +24,6 @@ ARCH	= $(COMPILE_PREFIX)-elf-ar
 SIZE	= $(COMPILE_PREFIX)-elf-size
 
 LIBS := -lzb_ed -ldrivers_8258
-
 
 DEVICE_TYPE = -DEND_DEVICE=1
 MCU_TYPE = -DMCU_CORE_8258=1
@@ -41,15 +41,13 @@ ZCL_VERSION_FILE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src 
 
 
 TL_CHECK = $(TOOLS_PATH)/tl_check_fw.py
-MAKE_OTA = $(TOOLS_PATH)/zigbee_ota.py
-#MAKE_OTA = $(TOOLS_PATH)/make_ota.py
+MAKE_OTA = $(TOOLS_PATH)/make_ota.py
+MAKE_OTA_TUYA = $(TOOLS_PATH)/make_ota_tuya.py
 
 INCLUDE_PATHS := \
 -I$(SDK_PATH)/platform \
 -I$(SDK_PATH)/proj/common \
 -I$(SDK_PATH)/proj \
--I$(SDK_PATH)/platform \
--I$(SDK_PATH)/platform/chip_8258 \
 -I$(SDK_PATH)/zigbee/common/includes \
 -I$(SDK_PATH)/zigbee/zbapi \
 -I$(SDK_PATH)/zigbee/bdb/includes \
@@ -59,8 +57,9 @@ INCLUDE_PATHS := \
 -I$(SDK_PATH)/zbhci \
 -I$(SRC_PATH) \
 -I$(SRC_PATH)/include \
+-I$(SRC_PATH)/zcl \
 -I$(SRC_PATH)/common \
--I$(SRC_PATH)/zcl
+-I./common
  
 
 LS_FLAGS := $(SDK_PATH)/platform/boot/8258/boot_8258.link
@@ -79,15 +78,16 @@ GCC_FLAGS := \
 
 ifeq ($(strip $(ZCL_VERSION_FILE)),)
 GCC_FLAGS += \
--DBUILD_DATE="{8,'2','0','2','5','0','7','2','6'}"
+-DBUILD_DATE="{8,'2','0','2','3','1','1','1','7'}"
 else
 GCC_FLAGS += \
 -DBUILD_DATE="{8,$(ZCL_VERSION_FILE)}"
 endif
-  
+
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE)
+
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -130,6 +130,7 @@ ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
 FW_FILE  := $(OUT_PATH)/firmware.bin
 BOOTLOADER := $(BIN_PATH)/bootloader/bootloader.bin
 
+
 SIZEDUMMY += \
 sizedummy \
 
@@ -150,14 +151,8 @@ erase-flash:
 flash-bootloader:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOTLOADER)
 
-reset:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -t50 -a2550 -m -w i
-
 flash-orig-write:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BIN_PATH)/ts0207_tz3000_orig.bin
-	
-flash-orig-read:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x100000 ts0207_tz3000_orig.bin
 	
 flash-orig-read-512k:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x80000 ts0207_tz3000_orig.bin
@@ -165,11 +160,12 @@ flash-orig-read-512k:
 flash-orig-read-1m:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m rf 0 0x100000 ts0207_tz3000_orig.bin
 	
-erase-flash-energy:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x3d000 0x3a000
-
 test-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -s i
+
+reset:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -t50 -a2550 -m -w i
+
 
 # Main-build Target
 main-build: clean-project $(ELF_FILE) secondary-outputs
@@ -181,28 +177,29 @@ $(ELF_FILE): $(OBJS) $(USER_OBJS)
 	$(LD) --gc-sections -L $(SDK_PATH)/zigbee/lib/tc32 -L $(SDK_PATH)/platform/lib -L $(SDK_PATH)/platform/tc32 -T $(LS_FLAGS) -o "$(ELF_FILE)" $(OBJS) $(USER_OBJS) $(LIBS) 
 	@echo 'Finished building target: $@'
 	@echo ' '
-	
+
+# "$(BOOT_FILE).o"	
 
 $(LST_FILE): $(ELF_FILE)
 	@echo 'Invoking: TC32 Create Extended Listing'
 	$(OBJDUMP) -x -D -l -S $(ELF_FILE)  > $(LST_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
-	
 
+ #$(BOOT_FILE)
+ 
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
-	@echo 'Create zigbee OTA file'
+	@echo 'Create zigbee OTA file from' $(BIN_FILE)
 	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
-	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -i 0x0397 -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
-	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -i 0x0218 -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
-	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -i 0x0212 -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
-	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -i 0x0219 -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	@echo ' '
 	@echo 'Create zigbee Tuya OTA file'
 	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -m 4417 -i 54179 -v0x1111114b -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin   
+	@echo 'Create zigbee Tuya OTA file'
+	@python3 $(MAKE_OTA_TUYA) -m 4742 -t 514 -o $(BIN_PATH)/1286-0202-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(APPENDIX)
+	@python3 $(MAKE_OTA_TUYA) -m 4417 -t 54179 -o $(BIN_PATH)/1141-d3a3-1111114b-$(LOWER_NAME)-$(PFX_NAME).zigbee $(BIN_FILE) $(BOOT_FILE)
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
@@ -213,6 +210,7 @@ sizedummy: $(ELF_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+# Other Targets
 # Other Targets
 clean:
 	@echo $(INCLUDE_PATHS)

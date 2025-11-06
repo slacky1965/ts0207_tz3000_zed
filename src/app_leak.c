@@ -65,13 +65,13 @@ void waterleak_handler() {
         return;
     }
 
-#if (BOARD == BOARD_ZG_222Z)
-    if (!drv_gpio_read(WLEAK_GPIO)) {
-#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
-        if (drv_gpio_read(WLEAK_GPIO)) {
-#else
-#error BOARD must be defined
-#endif
+//#if (BOARD == BOARD_ZG_222Z)
+//    if (!drv_gpio_read(WLEAK_GPIO)) {
+//#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
+      if (drv_gpio_read(WLEAK1) || !drv_gpio_read(WLEAK2)) {
+//#else
+//#error BOARD must be defined
+//#endif
 
         no_waterleak_count = 0;
 

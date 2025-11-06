@@ -35,9 +35,9 @@ extern "C" {
 #define ON                      1
 #define OFF                     0
 
-//#ifndef MCU_CORE_8258
-//#define MCU_CORE_8258   1
-//#endif
+#ifndef MCU_CORE_8258
+#define MCU_CORE_8258   1
+#endif
 
 /* for reporting */
 #define REPORTING_MIN           10              /* 10 sec                   */
@@ -46,8 +46,16 @@ extern "C" {
 #define REPORTING_BATTERY_MAX   0               /* reporting on the change  */
 
 /* for polling */
-#define LONG_POLL           REPORTING_MIN
-#define TIMEOUT_NET         TIMEOUT_30MIN
+#define LONG_POLL               REPORTING_MIN
+#define TIMEOUT_NET             TIMEOUT_30MIN
+
+/**********************************************************************
+ * Product Information
+ * max 24 symbols
+ */
+
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
 
 /* Debug mode config */
 #define UART_PRINTF_MODE                ON
@@ -77,6 +85,12 @@ extern "C" {
 #define TOUCHLINK_SUPPORT				ON
 #define FIND_AND_BIND_SUPPORT			OFF
 
+/* Board ID */
+
+#define BOARD_ZG_222Z                   1
+#define BOARD_ZG_222ZA                  2
+#define BOARD_SNZB_05                   3
+#define BOARDS_LEAK_SENSOR              4
 
 /* Board define */
 #if defined(MCU_CORE_826x)
@@ -90,7 +104,7 @@ extern "C" {
 #if (CHIP_TYPE == TLSR_8258_1M)
     #define FLASH_CAP_SIZE_1M           1
 #endif
-//    #define BOARD                       BOARD_ZG_222ZA
+    #define BOARD                       BOARDS_LEAK_SENSOR
     #define CLOCK_SYS_CLOCK_HZ          48000000
     #define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
 #elif defined(MCU_CORE_8278)
@@ -112,6 +126,8 @@ extern "C" {
 #include "board_zg_222za.h"
 #elif (BOARD == BOARD_SNZB_05)
 #include "board_snzb_05.h"
+#elif (BOARD == BOARDS_LEAK_SENSOR)
+#include "boards_leak_sensor.h"
 #else
 #error BOARD must be defined
 #endif

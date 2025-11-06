@@ -81,17 +81,17 @@ bdb_commissionSetting_t g_bdbCommissionSetting = {
     .touchlinkLqiThreshold = 0xA0,                                      /* threshold for touch-link scan req/resp command */
 };
 
-#if PM_ENABLE
-/**
- *  @brief Definition for wakeup source and level for PM
- */
-drv_pm_pinCfg_t g_switchPmCfg[] = {
-    {
-        BUTTON1,
-        PM_WAKEUP_LEVEL_LOW
-    },
-};
-#endif
+//#if PM_ENABLE
+///**
+// *  @brief Definition for wakeup source and level for PM
+// */
+//drv_pm_pinCfg_t g_switchPmCfg[] = {
+//    {
+//        BUTTON1,
+//        PM_WAKEUP_LEVEL_LOW
+//    },
+//};
+//#endif
 
 /**********************************************************************
  * LOCAL VARIABLES
@@ -250,11 +250,6 @@ void user_init(bool isRetention)
     if(!isRetention) {
 
         start_message();
-
-#ifdef CHECK_BOOTLOADER
-        bootloader_check();
-#endif
-
 
         /* Initialize Stack */
         stack_init();

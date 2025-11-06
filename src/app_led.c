@@ -3,34 +3,33 @@
 
 #include "app_main.h"
 
-void led_on(uint32_t pin)
-{
-    drv_gpio_write(pin, LED_ON);
+led_config_t led_config;
+
+static void led_on() {
+    for (uint8_t i = 0; i < led_config.led_num; i++) {
+        drv_gpio_write(led_config.led[i].gpio, led_config.led[i].on);
+    }
 }
 
-void led_off(uint32_t pin)
-{
-    drv_gpio_write(pin, LED_OFF);
+static void led_off() {
+    for (uint8_t i = 0; i < led_config.led_num ; i++) {
+        drv_gpio_write(led_config.led[i].gpio, led_config.led[i].off);
+    }
 }
 
-void light_on(void)
-{
-    led_on(LED1);
-}
-
-void light_off(void)
-{
-    led_off(LED1);
-}
-
-void light_init(void)
-{
-    led_off(LED1);
+void light_init(void) {
+    led_config.led_num = MAX_LED_NUM;
+    led_config.led[0].gpio = LED1;
+    led_config.led[0].on   = ON;
+    led_config.led[0].off  = OFF;
+    led_config.led[1].gpio = LED2;
+    led_config.led[1].on   = OFF;
+    led_config.led[1].off  = ON;
+    led_off();
 
 }
 
-int32_t zclLightTimerCb(void *arg)
-{
+int32_t zclLightTimerCb(void *arg) {
     uint32_t interval = 0;
 
     if(g_appCtx.sta == g_appCtx.oriSta){
@@ -43,28 +42,27 @@ int32_t zclLightTimerCb(void *arg)
 
     g_appCtx.sta = !g_appCtx.sta;
     if(g_appCtx.sta){
-        light_on();
+        led_on();
         interval = g_appCtx.ledOnTime;
     }else{
-        light_off();
+        led_off();
         interval = g_appCtx.ledOffTime;
     }
 
     return interval;
 }
 
-void light_blink_start(uint8_t times, uint16_t ledOnTime, uint16_t ledOffTime)
-{
+void light_blink_start(uint8_t times, uint16_t ledOnTime, uint16_t ledOffTime) {
     uint32_t interval = 0;
     g_appCtx.times = times;
 
     if(!g_appCtx.timerLedEvt){
         if(g_appCtx.oriSta){
-            light_off();
+            led_off();
             g_appCtx.sta = 0;
             interval = ledOffTime;
         }else{
-            light_on();
+            led_on();
             g_appCtx.sta = 1;
             interval = ledOnTime;
         }
@@ -82,9 +80,9 @@ void light_blink_stop(void)
 
         g_appCtx.times = 0;
         if(g_appCtx.oriSta){
-            light_on();
+            led_on();
         }else{
-            light_off();
+            led_off();
         }
     }
 }
