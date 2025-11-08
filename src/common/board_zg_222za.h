@@ -3,8 +3,6 @@
 
 /* boadr on ZTU or TLSR8258F1 */
 
-#define CHIP_FLASH_SIZE     1024
-
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
 #define DEBUG_INFO_TX_PIN       GPIO_PB1

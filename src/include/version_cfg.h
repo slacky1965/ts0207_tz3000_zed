@@ -58,21 +58,9 @@
 #error BOARD must be defined
 #endif
 
-#ifndef CHIP_FLASH_SIZE
-#define CHIP_FLASH_SIZE 512
-#endif
-
-#if (CHIP_FLASH_SIZE == 512)
-#define CHIP_TYPE                       TLSR_8258_512K
-#elif (CHIP_FLASH_SIZE == 1024)
-#define CHIP_TYPE                       TLSR_8258_1M
-#else
-#error CHIP_FLASH_SIZE must be 512 or 1024
-#endif
-
 #define APP_RELEASE                         0x10        //app release 1.0
 #ifndef VERSION_BUILD
-    #define APP_BUILD                       0x04        //app build 04, full version - v1.0.04
+    #define APP_BUILD                       0x05        //app build 05, full version - v1.0.05
 #endif
 
 #define STACK_RELEASE                       0x30        //stack release 3.0

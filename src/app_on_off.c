@@ -3,6 +3,7 @@
 //static bool sw_onoff = false;
 
 void cmdOnOff(uint8_t command) {
+    status_t st = ZCL_STA_SUCCESS;
     epInfo_t dstEpInfo;
     TL_SETSTRUCTCONTENT(dstEpInfo, 0);
 
@@ -17,22 +18,25 @@ void cmdOnOff(uint8_t command) {
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("OnOff command: off\r\n");
 #endif /* UART_PRINTF_MODE */
-            zcl_onOff_offCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
+            st = zcl_onOff_offCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
             break;
         case ZCL_CMD_ONOFF_ON:
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("OnOff command: on\r\n");
 #endif /* UART_PRINTF_MODE */
-            zcl_onOff_onCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
+            st = zcl_onOff_onCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
             break;
         case ZCL_CMD_ONOFF_TOGGLE:
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("OnOff command: toggle\r\n");
 #endif /* UART_PRINTF_MODE */
-            zcl_onOff_toggleCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
+            st = zcl_onOff_toggleCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
             break;
         default:
             break;
     }
+#if UART_PRINTF_MODE && DEBUG_ONOFF
+    printf("OnOff command return: %d\r\n", st);
+#endif /* UART_PRINTF_MODE */
 }
 

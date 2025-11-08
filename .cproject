@@ -160,15 +160,15 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="2. Flash bootloader 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="2. Flash bootloader" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments>-f makefile.bootloader BOARD_NAME=ZG_222ZA</buildArguments>
-				<buildTarget>bootloader-flash</buildTarget>
+				<buildArguments/>
+				<buildTarget>flash-bootloader</buildTarget>
 				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
+				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="3.1 Firmware 1M ZG-222ZA" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="3.1 Firmware ZG-222ZA" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=ZG_222ZA</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -214,7 +214,7 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="3.2 Firmware 512K ZG-222Z" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="3.2 Firmware ZG-222Z" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=ZG_222Z</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -230,7 +230,7 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="3.3 Firmware 512K SNZB-05" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="3.3 Firmware SNZB-05" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=SNZB_05</buildArguments>
 				<buildTarget>all</buildTarget>

@@ -1,8 +1,6 @@
 #ifndef SRC_COMMON_BOARD_SNZB_05_H_
 #define SRC_COMMON_BOARD_SNZB_05_H_
 
-#define CHIP_FLASH_SIZE     512
-
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
 #define DEBUG_INFO_TX_PIN       GPIO_PB1
