@@ -123,22 +123,14 @@
 		<buildTargets>
 			<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>clean</buildTarget>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
-			<target name="flash" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>make</buildCommand>
-				<buildArguments/>
-				<buildTarget>flash</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="erase-flash" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>erase-flash</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -146,21 +138,12 @@
 			</target>
 			<target name="reset" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>reset</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="1. bootloader 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>make</buildCommand>
-				<buildArguments>-f makefile.bootloader BOARD_NAME=ZG_222ZA</buildArguments>
-				<buildTarget>bootloader</buildTarget>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
-			<target name="2. Flash bootloader" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="flash bootloader" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments/>
 				<buildTarget>flash-bootloader</buildTarget>
@@ -168,7 +151,7 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="3.1 Firmware ZG-222ZA" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="1 Firmware ZG-222ZA" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=ZG_222ZA</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -176,25 +159,16 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="4. Firmware OTA 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>make</buildCommand>
-				<buildArguments>CHECK_BL=1 BOARD_NAME=ZG_222ZA</buildArguments>
-				<buildTarget>all</buildTarget>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>false</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
-			<target name="5. Flash firmware 1M ZG-222ZA" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="4. Flash firmware ZG-222ZA" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=ZG_222ZA</buildArguments>
-				<buildTarget>flash</buildTarget>
+				<buildTarget>flash-512k</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="test-flash" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>test-flash</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -202,6 +176,7 @@
 			</target>
 			<target name="flash-orig-read-1m" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>flash-orig-read-1m</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -209,12 +184,13 @@
 			</target>
 			<target name="flash-orig-write" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>flash-orig-write</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="3.2 Firmware ZG-222Z" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="2 Firmware ZG-222Z" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=ZG_222Z</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -222,7 +198,7 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="6.1 Flash firmware 512K ZG-222Z" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="5 Flash firmware ZG-222Z" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=ZG_222Z</buildArguments>
 				<buildTarget>flash-512k</buildTarget>
@@ -230,7 +206,7 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="3.3 Firmware SNZB-05" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="3 Firmware SNZB-05" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=SNZB_05</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -238,7 +214,7 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="6.2 Flash firmware 512K SNZB-05" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="6 Flash firmware SNZB-05" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>BOARD_NAME=SNZB_05</buildArguments>
 				<buildTarget>flash-512k</buildTarget>
@@ -248,9 +224,18 @@
 			</target>
 			<target name="flash-orig-read-512k" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>flash-orig-read-512k</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="firmware flash 8000" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments>BOARD_NAME=ZG_222ZA</buildArguments>
+				<buildTarget>flash8000</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 		</buildTargets>

@@ -135,19 +135,6 @@ void waterleak_handler() {
 #endif /* DEBUG_ONOFF */
 
             leak_cmd(onoffCfgAttrs->switchActions);
-//            switch (onoffCfgAttrs->switchActions) {
-//            case ZCL_SWITCH_ACTION_ON_OFF:
-//                cmdOnOff(ZCL_CMD_ONOFF_OFF);
-//                break;
-//            case ZCL_SWITCH_ACTION_OFF_ON:
-//                cmdOnOff(ZCL_CMD_ONOFF_ON);
-//                break;
-////            case ZCL_SWITCH_ACTION_TOGGLE:
-////                cmdOnOff(ZCL_CMD_ONOFF_TOGGLE);
-////                break;
-//            default:
-//                break;
-//            }
 
             app_setPollRate(TIMEOUT_20SEC);
 

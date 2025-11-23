@@ -170,7 +170,7 @@ sizedummy \
 # All Target
 all: pre-build main-build
 
-flash:
+flash8000:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
 
 flash-512k:
