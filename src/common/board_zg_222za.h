@@ -3,8 +3,6 @@
 
 /* boadr on ZTU or TLSR8258F1 */
 
-#define CHIP_FLASH_SIZE     1024
-
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
 #define DEBUG_INFO_TX_PIN       GPIO_PB1
@@ -24,12 +22,12 @@
 #define PB4_INPUT_ENABLE        OFF
 #define PB4_DATA_OUT            LED_OFF
 
-#define LED_POWER               GPIO_PA0
-#define PA0_FUNC                AS_GPIO
-#define PA0_OUTPUT_ENABLE       ON
-#define PA0_INPUT_ENABLE        OFF
-
-#define LED_PERMIT              LED_STATUS
+//#define LED_POWER               GPIO_PA0
+//#define PA0_FUNC                AS_GPIO
+//#define PA0_OUTPUT_ENABLE       ON
+//#define PA0_INPUT_ENABLE        OFF
+//
+//#define LED_PERMIT              LED_STATUS
 #define LED1                    LED_STATUS
 
 

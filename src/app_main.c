@@ -194,6 +194,7 @@ void app_task(void) {
         report_handler();
 #if PM_ENABLE
         button_handler();
+        waterleak_handler();
         if(!button_idle() && !waterleak_idle()) {
             app_lowPowerEnter();
         }
@@ -251,11 +252,6 @@ void user_init(bool isRetention)
 
         start_message();
 
-#ifdef CHECK_BOOTLOADER
-        bootloader_check();
-#endif
-
-
         /* Initialize Stack */
         stack_init();
 
@@ -289,6 +285,13 @@ void user_init(bool isRetention)
         /* Initialize BDB */
         uint8_t repower = drv_pm_deepSleep_flag_get() ? 0 : 1;
         bdb_init((af_simple_descriptor_t *)&app_ep1Desc, &g_bdbCommissionSetting, &g_zbBdbCb, repower);
+
+        if (zb_getLocalShortAddr() < 0xFFF8) {
+            app_setPollRate(TIMEOUT_2MIN);
+            if(!zb_isDeviceJoinedNwk()) {
+                zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+            }
+        }
 
     }else{
         /* Re-config phy when system recovery from deep sleep with retention */

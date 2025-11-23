@@ -1,17 +1,21 @@
 #include "app_main.h"
 
-#define WATERLEAK_COUNT_MAX  16
+#define WATERLEAK_COUNT_MAX 16
+#define WATERLEAK_OPER      5
 
 static uint8_t waterleak_count = 0;
 static uint8_t no_waterleak_count = 0;
 static uint32_t check_rejoin = 0;
 static uint8_t first_start = 1;
-static bool reset_leak = false;
+//static bool reset_leak = false;
+static uint8_t waterleak_oper = 0;
 static ev_timer_event_t *timerResetLeakEvt = NULL;
 
 void fillIASAddress(epInfo_t* pdstEpInfo) {
     u16 len;
     u8 zoneState;
+
+    printf("fillIASAddress\r\n");
 
     memset((u8 *)pdstEpInfo, 0, sizeof(epInfo_t));
 
@@ -30,12 +34,40 @@ void fillIASAddress(epInfo_t* pdstEpInfo) {
     }
 }
 
+static void leak_cmd(uint8_t action) {
+
+    switch (action) {
+    case ZCL_SWITCH_ACTION_ON_OFF:
+        cmdOnOff(ZCL_CMD_ONOFF_OFF);
+        break;
+    case ZCL_SWITCH_ACTION_OFF_ON:
+        cmdOnOff(ZCL_CMD_ONOFF_ON);
+        break;
+//            case ZCL_SWITCH_ACTION_TOGGLE:
+//                cmdOnOff(ZCL_CMD_ONOFF_TOGGLE);
+//                break;
+    default:
+        break;
+    }
+}
+
 static int32_t reset_leakTimerCb() {
 
-    g_appCtx.leak = false;
+    zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
 
-    reset_leak = true;
+//    reset_leak = true;
 
+    if (waterleak_oper < WATERLEAK_OPER) {
+        if (waterleak_oper == 0) {
+            g_appCtx.leak = false;
+        } else {
+            leak_cmd(onoffCfgAttrs->switchActions);
+        }
+        waterleak_oper++;
+        return TIMEOUT_1SEC;
+    }
+
+    waterleak_oper = 0;
     timerResetLeakEvt = NULL;
     return -1;
 }
@@ -102,24 +134,14 @@ void waterleak_handler() {
             printf("Switch action: 0x0%x\r\n", onoffCfgAttrs->switchActions);
 #endif /* DEBUG_ONOFF */
 
-            switch (onoffCfgAttrs->switchActions) {
-            case ZCL_SWITCH_ACTION_ON_OFF:
-                cmdOnOff(ZCL_CMD_ONOFF_OFF);
-                break;
-            case ZCL_SWITCH_ACTION_OFF_ON:
-                cmdOnOff(ZCL_CMD_ONOFF_ON);
-                break;
-//            case ZCL_SWITCH_ACTION_TOGGLE:
-//                cmdOnOff(ZCL_CMD_ONOFF_TOGGLE);
-//                break;
-            default:
-                break;
-            }
+            leak_cmd(onoffCfgAttrs->switchActions);
 
             app_setPollRate(TIMEOUT_20SEC);
 
-            if (!reset_leak)
-                timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
+            if (!timerResetLeakEvt) timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
+
+//            if (!reset_leak)
+//                timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
 
             g_appCtx.leak = true;
             waterleak_count = 0;
@@ -137,9 +159,9 @@ void waterleak_handler() {
 
             g_appCtx.leak = false;
             no_waterleak_count = 0;
-            reset_leak = false;
-            if (timerResetLeakEvt)
-                TL_ZB_TIMER_CANCEL(&timerResetLeakEvt);
+//            reset_leak = false;
+//            if (timerResetLeakEvt)
+//                TL_ZB_TIMER_CANCEL(&timerResetLeakEvt);
 
             app_setPollRate(TIMEOUT_20SEC);
 
