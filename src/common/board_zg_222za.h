@@ -1,5 +1,10 @@
-#ifndef SRC_COMMON_BOARD_ZG_222ZA_H_
-#define SRC_COMMON_BOARD_ZG_222ZA_H_
+
+#pragma once
+
+/* Enable C linkage for C++ Compilers: */
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /* boadr on ZTU or TLSR8258F1 */
 
@@ -63,4 +68,7 @@ enum {
 #define KB_DRIVE_PINS  {NULL }
 #define KB_SCAN_PINS   {BUTTON1}
 
-#endif /* SRC_COMMON_BOARD_ZG_222ZA_H_ */
+/* Disable C linkage for C++ Compilers: */
+#if defined(__cplusplus)
+}
+#endif
