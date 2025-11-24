@@ -1,12 +1,12 @@
 #include "app_main.h"
 
-#define WATERLEAK_COUNT_MAX 16
+#define WATERLEAK_COUNT_MAX 8
 #define WATERLEAK_OPER      5
 
 static uint8_t waterleak_count = 0;
 static uint8_t no_waterleak_count = 0;
-static uint32_t check_rejoin = 0;
-static uint8_t first_start = 1;
+//static uint32_t check_rejoin = 0;
+//static uint8_t first_start = 1;
 //static bool reset_leak = false;
 static uint8_t waterleak_oper = 0;
 static ev_timer_event_t *timerResetLeakEvt = NULL;
@@ -15,7 +15,7 @@ void fillIASAddress(epInfo_t* pdstEpInfo) {
     u16 len;
     u8 zoneState;
 
-    printf("fillIASAddress\r\n");
+//    printf("fillIASAddress\r\n");
 
     memset((u8 *)pdstEpInfo, 0, sizeof(epInfo_t));
 
@@ -51,6 +51,57 @@ static void leak_cmd(uint8_t action) {
     }
 }
 
+static void waterleak_ias(bool leak) {
+
+    uint16_t len;
+    epInfo_t dstEpInfo;
+    zoneStatusChangeNoti_t statusChangeNotification;
+
+    fillIASAddress(&dstEpInfo);
+
+    zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, &len, (u8*) &statusChangeNotification.zoneStatus);
+    zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_ID, &len, &statusChangeNotification.zoneId);
+
+    if (leak) {
+        statusChangeNotification.zoneStatus |= ZONE_STATUS_BIT_ALARM1;
+    } else {
+        statusChangeNotification.zoneStatus &= ~ZONE_STATUS_BIT_ALARM1;
+    }
+
+    zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, (u8*) &statusChangeNotification.zoneStatus);
+    statusChangeNotification.extStatus = 0;
+    statusChangeNotification.delay = 0;
+
+    zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+
+}
+
+static int32_t onoff_cmd_repeatCb(void *args) {
+
+    zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
+
+    app_setPollRate(TIMEOUT_5SEC);
+
+#if (BOARD == BOARD_ZG_222Z)
+    if (!drv_gpio_read(WLEAK_GPIO)) {
+#elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
+    if (drv_gpio_read(WLEAK_GPIO)) {
+#else
+#error BOARD must be defined
+#endif
+        g_appCtx.leak = true;
+        waterleak_ias(1);
+        leak_cmd(onoffCfgAttrs->switchActions);
+        return 0;
+    } else {
+        g_appCtx.leak = false;
+    }
+
+    waterleak_ias(0);
+    g_appCtx.timerOnOffRepeatEvt = NULL;
+    return -1;
+}
+
 static int32_t reset_leakTimerCb() {
 
     zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
@@ -69,38 +120,28 @@ static int32_t reset_leakTimerCb() {
 
     waterleak_oper = 0;
     timerResetLeakEvt = NULL;
+
+    if (!g_appCtx.timerSetPollRateEvt) {
+        app_setPollRate(TIMEOUT_20SEC);
+    }
+
+    if (!g_appCtx.timerOnOffRepeatEvt) g_appCtx.timerOnOffRepeatEvt = TL_ZB_TIMER_SCHEDULE(onoff_cmd_repeatCb, NULL, TIME_REPEAT_ONOFF);
+
     return -1;
 }
 
 void waterleak_handler() {
 
-    uint16_t len;
-    epInfo_t dstEpInfo;
-    zoneStatusChangeNoti_t statusChangeNotification;
     zcl_onOffSwitchCfgAttr_t *onoffCfgAttrs = zcl_onOffSwitchCfgAttrGet();
 
-    if (zb_getLocalShortAddr() < 0xFFF8) {
-
-        if (first_start) {
-            check_rejoin = clock_time();
-            first_start = 0;
-        }
-
-        if (!zb_isDeviceJoinedNwk()) {
-            if (clock_time_exceed(check_rejoin, TIMEOUT_TICK_5SEC)) {
-                check_rejoin = clock_time();
-                zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
-                return;
-            }
-        }
-    } else {
+    if (zb_getLocalShortAddr() >= 0xFFF8) {
         return;
     }
 
 #if (BOARD == BOARD_ZG_222Z)
     if (!drv_gpio_read(WLEAK_GPIO)) {
 #elif (BOARD == BOARD_ZG_222ZA || BOARD == BOARD_SNZB_05)
-        if (drv_gpio_read(WLEAK_GPIO)) {
+    if (drv_gpio_read(WLEAK_GPIO)) {
 #else
 #error BOARD must be defined
 #endif
@@ -118,17 +159,7 @@ void waterleak_handler() {
             printf("There is a water leak.\r\n");
 #endif /* DEBUG_LEAK */
 
-            fillIASAddress(&dstEpInfo);
-
-            zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, &len, (u8*) &statusChangeNotification.zoneStatus);
-            zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_ID, &len, &statusChangeNotification.zoneId);
-
-            statusChangeNotification.zoneStatus |= ZONE_STATUS_BIT_ALARM1;
-            zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, (u8*) &statusChangeNotification.zoneStatus);
-            statusChangeNotification.extStatus = 0;
-            statusChangeNotification.delay = 0;
-
-            zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+            waterleak_ias(1);
 
 #if UART_PRINTF_MODE && DEBUG_ONOFF
             printf("Switch action: 0x0%x\r\n", onoffCfgAttrs->switchActions);
@@ -139,9 +170,6 @@ void waterleak_handler() {
             app_setPollRate(TIMEOUT_20SEC);
 
             if (!timerResetLeakEvt) timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
-
-//            if (!reset_leak)
-//                timerResetLeakEvt = TL_ZB_TIMER_SCHEDULE(reset_leakTimerCb, NULL, TIMEOUT_700MS);
 
             g_appCtx.leak = true;
             waterleak_count = 0;
@@ -159,10 +187,6 @@ void waterleak_handler() {
 
             g_appCtx.leak = false;
             no_waterleak_count = 0;
-//            reset_leak = false;
-//            if (timerResetLeakEvt)
-//                TL_ZB_TIMER_CANCEL(&timerResetLeakEvt);
-
             app_setPollRate(TIMEOUT_20SEC);
 
 #if UART_PRINTF_MODE && DEBUG_LEAK
@@ -186,17 +210,7 @@ void waterleak_handler() {
             }
 #endif /* DEBUG_LEAK */
 
-            fillIASAddress(&dstEpInfo);
-
-            zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, &len, (u8*) &statusChangeNotification.zoneStatus);
-            zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_ID, &len, &statusChangeNotification.zoneId);
-
-            statusChangeNotification.zoneStatus &= ~ZONE_STATUS_BIT_ALARM1;
-            zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, (u8*) &statusChangeNotification.zoneStatus);
-            statusChangeNotification.extStatus = 0;
-            statusChangeNotification.delay = 0;
-
-            zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+            waterleak_ias(0);
         }
     }
 }

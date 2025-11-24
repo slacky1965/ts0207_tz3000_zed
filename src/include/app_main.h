@@ -37,10 +37,13 @@ typedef struct {
     ev_timer_event_t *timerBatteryEvt;
     ev_timer_event_t *timerLedEvt;
     ev_timer_event_t *timerCheckSleepEvt;
+    ev_timer_event_t *timerOnOffRepeatEvt;
+
 
     button_t button[MAX_BUTTON_NUM];
-    u8  keyPressed;
+    uint8_t  keyPressed;
 
+    uint8_t  led_ota;
     uint16_t ledOnTime;
     uint16_t ledOffTime;
     uint8_t  oriSta;     //original state before blink
@@ -49,14 +52,13 @@ typedef struct {
 
     uint32_t read_sensor_time;
 
-//    uint32_t time_without_joined;
+    bool     leak;
+    bool     not_sleep;
+    bool     ota;
 
-    bool leak;
-    bool not_sleep;
-    bool ota;
-    analog_reg_t analog_reg;
+    uint8_t  battery_read;
 
-    bool net_steer_start;
+    bool     net_steer_start;
 
     app_linkKey_info_t tcLinkKey;
 } app_ctx_t;

@@ -285,8 +285,11 @@ sizedummy: $(ELF_FILE)
 
 # Other Targets
 clean:
-	@echo $(INCLUDE_PATHS)
 	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE)
+	-@echo ' '
+	
+clean-bin:
+	-$(RM) $(BIN_PATH)/*.bin $(BIN_PATH)/*.zigbee
 	-@echo ' '
 	
 clean-project:

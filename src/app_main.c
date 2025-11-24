@@ -9,9 +9,12 @@ app_ctx_t g_appCtx = {
         .timerForcedReportEvt = NULL,
         .timerCheckSleepEvt = NULL,
         .timerSetPollRateEvt = NULL,
+        .timerOnOffRepeatEvt = NULL,
         .oriSta = false,
+        .led_ota = 4,                       // When OTA flash once every 1 minute
         .net_steer_start = false,
         .read_sensor_time = 0,
+        .battery_read = 4,                  // Once every 4 hours
         .leak = 0,
         .not_sleep = true,
         .ota = false,
@@ -156,23 +159,23 @@ void user_app_init(void)
     ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&app_ep1Desc, &app_otaInfo, &app_otaCb);
 #endif
 
-    uint8_t reg_data = app_get_analog_reg();
-
-    memcpy(&g_appCtx.analog_reg, &reg_data, 1);
-
-    if (g_appCtx.analog_reg.deep_sleep) {
-        g_appCtx.leak = g_appCtx.analog_reg.leak;
-    }
-
-    g_appCtx.analog_reg.deep_sleep = 0;
-    g_appCtx.analog_reg.leak = 0;
-    app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
+//    uint8_t reg_data = app_get_analog_reg();
+//
+//    memcpy(&g_appCtx.analog_reg, &reg_data, 1);
+//
+//    if (g_appCtx.analog_reg.deep_sleep) {
+//        g_appCtx.leak = g_appCtx.analog_reg.leak;
+//    }
+//
+//    g_appCtx.analog_reg.deep_sleep = 0;
+//    g_appCtx.analog_reg.leak = 0;
+//    app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
 
     batteryCb(NULL);
 
-    if (zb_getLocalShortAddr() < 0xFFF8) {
-        app_setPollRate(TIMEOUT_20SEC);
-    }
+//    if (zb_getLocalShortAddr() < 0xFFF8) {
+//        app_setPollRate(TIMEOUT_20SEC);
+//    }
 }
 
 void app_task(void) {
@@ -184,9 +187,19 @@ void app_task(void) {
         if (clock_time_exceed(g_appCtx.read_sensor_time, TIMEOUT_TICK_15SEC)) {
             g_appCtx.read_sensor_time = clock_time();
             light_blink_stop();
-            light_blink_start(1, 30, 30);
+            if (g_appCtx.ota) {
+                if (g_appCtx.led_ota-- == 0) {
+                    g_appCtx.led_ota = 4;
+                    light_blink_start(1, 30, 30);
+                }
+            } else {
+                light_blink_start(1, 30, 30);
+            }
 
-            batteryCb(NULL);
+            if (g_appCtx.battery_read-- == 0) {
+                g_appCtx.battery_read = 4;
+                if (!g_appCtx.ota) batteryCb(NULL);
+            }
         }
     }
 
@@ -286,17 +299,19 @@ void user_init(bool isRetention)
         uint8_t repower = drv_pm_deepSleep_flag_get() ? 0 : 1;
         bdb_init((af_simple_descriptor_t *)&app_ep1Desc, &g_bdbCommissionSetting, &g_zbBdbCb, repower);
 
-        if (zb_getLocalShortAddr() < 0xFFF8) {
-            app_setPollRate(TIMEOUT_2MIN);
-            if(!zb_isDeviceJoinedNwk()) {
-                zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
-            }
-        }
+//        if (zb_getLocalShortAddr() < 0xFFF8) {
+//            app_setPollRate(TIMEOUT_2MIN);
+//            if(!zb_isDeviceJoinedNwk()) {
+//                zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+//            }
+//        }
 
     }else{
         /* Re-config phy when system recovery from deep sleep with retention */
         mac_phyReconfig();
-
+        if (zb_getLocalShortAddr() < 0xFFF8 && !g_appCtx.timerSetPollRateEvt && !g_appCtx.ota) {
+            app_setPollRate(TIMEOUT_20SEC);
+        }
     }
 }
 

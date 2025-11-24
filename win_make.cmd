@@ -1,4 +1,5 @@
 make clean
+make clean-bin
 make all BOARD_NAME=ZG_222ZA
 
 make clean
