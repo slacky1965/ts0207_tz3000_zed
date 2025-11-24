@@ -32,22 +32,21 @@ extern "C" {
 
 #include "app_types.h"
 
-#define ON                      1
-#define OFF                     0
-
-//#ifndef MCU_CORE_8258
-//#define MCU_CORE_8258   1
-//#endif
+#define ON                              1
+#define OFF                             0
 
 /* for reporting */
-#define REPORTING_MIN           10              /* 10 sec                   */
-#define REPORTING_MAX           3600            /* 60 min                   */
-#define REPORTING_BATTERY_MIN   3600            /* 1 hour                   */
-#define REPORTING_BATTERY_MAX   0               /* reporting on the change  */
+#define REPORTING_MIN                   10              /* 10 sec                   */
+#define REPORTING_MAX                   3600            /* 60 min                   */
+#define REPORTING_BATTERY_MIN           3600            /* 1 hour                   */
+#define REPORTING_BATTERY_MAX           0               /* reporting on the change  */
 
 /* for polling */
-#define LONG_POLL           REPORTING_MIN
-#define TIMEOUT_NET         TIMEOUT_30MIN
+#define LONG_POLL                       REPORTING_MIN
+#define TIMEOUT_NET                     TIMEOUT_30MIN
+
+/* for OTA */
+#define APP_OTA_PERIODIC_QUERY_INTERVAL (1080 * 60)     /* start the OTA request after the set seconds */
 
 /* Debug mode config */
 #define UART_PRINTF_MODE                ON
