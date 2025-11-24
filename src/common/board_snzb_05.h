@@ -1,5 +1,11 @@
-#ifndef SRC_COMMON_BOARD_SNZB_05_H_
-#define SRC_COMMON_BOARD_SNZB_05_H_
+
+#pragma once
+
+/* Enable C linkage for C++ Compilers: */
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
@@ -61,4 +67,7 @@ enum {
 #define KB_DRIVE_PINS  {NULL }
 #define KB_SCAN_PINS   {BUTTON1}
 
-#endif /* SRC_COMMON_BOARD_SNZB_05_H_ */
+/* Disable C linkage for C++ Compilers: */
+#if defined(__cplusplus)
+}
+#endif
