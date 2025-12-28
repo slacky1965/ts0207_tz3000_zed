@@ -7,7 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -23,40 +23,27 @@
  *
  *******************************************************************************************************/
 
-#pragma once
+#ifndef SRC_INCLUDE_VERSION_CFG_H_
+#define SRC_INCLUDE_VERSION_CFG_H_
 
-#ifndef MCU_CORE_8258
-#define MCU_CORE_8258   1
-#endif
+#include "../common/comm_cfg.h"
 
 /* Board ID */
 
-#define BOARD_ZG_222Z                   1
-#define BOARD_ZG_222ZA                  2
-#define BOARD_SNZB_05                   3
+#define BOARD_ZG_222ZA                  0x17
+#define BOARD_ZG_222Z                   0x18
+#define BOARD_SNZB_05                   0x19
 
 #ifndef BOARD
-#define BOARD                           BOARD_ZG_222ZA //BOARD_SNZB_05 //
+#define BOARD                           BOARD_ZG_222ZA
+//#define BOARD                           BOARD_ZG_222Z
+//#define BOARD                           BOARD_SNZB_05
 #endif
 
-#include "../common/comm_cfg.h"
 
 /**********************************************************************
  * Product Information
  */
-#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
-#if (BOARD == BOARD_ZG_222Z)
-#define IMAGE_TYPE_BOARD    0x18
-#define ZCL_BASIC_MODEL_ID     {13,'Z','G','-','2','2','2','Z','-','z','-','S','l','D'}
-#elif (BOARD == BOARD_ZG_222ZA)
-#define IMAGE_TYPE_BOARD    0x17
-#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
-#elif (BOARD == BOARD_SNZB_05)
-#define IMAGE_TYPE_BOARD    0x19
-#define ZCL_BASIC_MODEL_ID     {13,'S','N','Z','B','-','0','5','-','z','-','S','l','D'}
-#else
-#error BOARD must be defined
-#endif
 
 #define APP_RELEASE                         0x10        //app release 1.0
 #define APP_BUILD                           0x05        //app build 05, full version - v1.0.05
@@ -64,13 +51,6 @@
 #define STACK_RELEASE                       0x30        //stack release 3.0
 #define STACK_BUILD                         0x01        //stack build 01
 #define HW_VERSION                          0x01
-
-#ifndef ZCL_BASIC_MFG_NAME
-    #define ZCL_BASIC_MFG_NAME     {6,'T','E','L','I','N','K'}
-#endif
-#ifndef ZCL_BASIC_MODEL_ID
-    #define ZCL_BASIC_MODEL_ID     {8,'T','L','S','R','8','2','5','x'}
-#endif
 
 #ifndef BUILD_DATE
 #define BUILD_DATE "20250611"
@@ -116,7 +96,7 @@
  *
  */
 
-#define IMAGE_TYPE_APP              (IMAGE_TYPE_BOARD | (IMAGE_TYPE_BOOT_FLAG << 7))
+#define IMAGE_TYPE_APP              (BOARD | (IMAGE_TYPE_BOOT_FLAG << 7))
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
@@ -132,3 +112,6 @@
 #define IS_BOOT_LOADER_IMAGE                0
 #define RESV_FOR_APP_RAM_CODE_SIZE          0
 #define IMAGE_OFFSET                        APP_IMAGE_ADDR
+
+
+#endif /* SRC_INCLUDE_VERSION_CFG_H_ */
