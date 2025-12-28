@@ -1,30 +1,10 @@
 # Set Project Name
-PROJECT_NAME := ts0207_tz3000_zed
+#PROJECT_NAME ?= ts0207_tz3000_zed
+PROJECT_NAME ?= zg_227za_0x17_zed
+PROJECT_DEF ?= "-DBOARD=BOARD_ZG_222ZA"
 
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
-
-BOARD_NAME ?= ZG_222Z
-
-BOARD_ZG_222Z  = 1
-BOARD_ZG_222ZA = 2
-BOARD_SNZB_05 = 3
-
-ifeq ($(BOARD_NAME),ZG_222ZA)
-	BOARD = $(BOARD_ZG_222ZA)
-else
-	ifeq ($(BOARD_NAME),ZG_222Z)
-		BOARD = $(BOARD_ZG_222Z)
-	else
-		ifeq ($(BOARD_NAME),SNZB_05)
-			BOARD = $(BOARD_SNZB_05)
-		else
-			BOARD = $(BOARD_ZG_222Z)
-		endif
-	endif
-endif
-
-
 
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
@@ -49,7 +29,7 @@ LIBS := -lzb_ed -ldrivers_8258
 
 DEVICE_TYPE = -DEND_DEVICE=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DBOARD=$(BOARD)
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 $(PROJECT_DEF)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -112,8 +92,7 @@ endif
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
--DBOARD=$(BOARD)
-
+$(PROJECT_DEF)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -150,16 +129,22 @@ RM := rm -rf
 -include ./project.mk
 
 # Add inputs and outputs from these tool invocations to the build variables 
-LOWER_NAME := $(shell echo $(BOARD_NAME) | tr [:upper:] [:lower:])
-FIRMWARE_NAME := $(LOWER_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD)
-FIRMWARE_FILE := $(FIRMWARE_NAME).bin
-#BOOT_FILE := $(BIN_PATH)/bootloader_$(PFX_NAME).bin
-APPENDIX := $(BIN_PATH)/marker.bin
-LST_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).lst
-BIN_FILE := $(BIN_PATH)/$(FIRMWARE_NAME).bin 
-#$(OUT_PATH)/$(PROJECT_NAME).bin
-ELF_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).elf
+LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
+BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
+ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
+FW_FILE  := $(OUT_PATH)/firmware.bin
 BOOTLOADER := $(BIN_PATH)/bootloader/bootloader.bin
+
+#LOWER_NAME := $(shell echo $(BOARD_NAME) | tr [:upper:] [:lower:])
+#FIRMWARE_NAME := $(LOWER_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD)
+#FIRMWARE_FILE := $(FIRMWARE_NAME).bin
+##BOOT_FILE := $(BIN_PATH)/bootloader_$(PFX_NAME).bin
+#APPENDIX := $(BIN_PATH)/marker.bin
+#LST_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).lst
+#BIN_FILE := $(BIN_PATH)/$(FIRMWARE_NAME).bin 
+##$(OUT_PATH)/$(PROJECT_NAME).bin
+#ELF_FILE := $(OUT_PATH)/$(FIRMWARE_NAME).elf
+#BOOTLOADER := $(BIN_PATH)/bootloader/bootloader.bin
 
 
 
@@ -210,8 +195,6 @@ flash-bootloader:
 test-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -s i
 
-	
-
 reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -t50 -a2550 -m -w i
 
@@ -235,45 +218,50 @@ $(LST_FILE): $(ELF_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+ifeq ($(PROJECT_NAME),zg_227za_0x17_zed)
+$(BIN_FILE): $(ELF_FILE)
+	@echo 'Create Flash image (binary format)'
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
+	@python3 $(TL_CHECK) $(BIN_FILE)
+	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@echo 'Create zigbee OTA file'
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -i 0x0397 -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	@echo 'Create zigbee Tuya OTA file'
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -m 4417 -i 54179 -v0x1111114b -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@echo ' '
+	@echo 'Finished building: $@'
+	@echo ' '
 
-ifeq ($(BOARD_NAME),SNZB_05)
-$(BIN_FILE): $(ELF_FILE)
-	@echo 'Create Flash image (binary format)'
-	@$(OBJCOPY) -v -O binary $(ELF_FILE) $(BIN_FILE)
-	@python3 $(TL_CHECK) $(BIN_FILE)
-	@echo 'Create zigbee OTA file from' $(BIN_FILE)
-	@python3 $(MAKE_OTA) -t $(BOARD_NAME) -s "Slacky-DIY OTA" $(BIN_FILE) 
-	@echo ' '
-	@echo 'Create zigbee Tuya OTA file'
-	@python3 $(MAKE_OTA) -t $(BOARD_NAME) -m 4742 -i 514 -v0x1111114b -s "Slacky-DIY OTA" $(BIN_FILE)   
-	@echo ' '
-	@echo 'Finished building: $@'
-	@echo ' '
 else
-ifeq ($(BOARD_NAME),ZG_222ZA)
+ifeq ($(PROJECT_NAME),zg_227z_0x18_zed)
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
-	@$(OBJCOPY) -v -O binary $(ELF_FILE) $(BIN_FILE)
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@echo 'Create zigbee OTA file from' $(BIN_FILE)
-	@python3 $(MAKE_OTA) -t $(BOARD_NAME) -s "Slacky-DIY OTA" $(BIN_FILE) 
-	@python3 $(MAKE_OTA) -t $(BOARD_NAME) -i 0x0397 -s "Slacky-DIY OTA" $(BIN_FILE) 
-	@echo 'Create zigbee Tuya OTA file'
-	@python3 $(MAKE_OTA) -t $(BOARD_NAME) -m 4417 -i 54179 -v0x1111114b -s "Slacky-DIY OTA" $(BIN_FILE)   
+	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@echo 'Create zigbee OTA file'
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
+
 else
-# BOARD_NAME ZG_222Z
+ifeq ($(PROJECT_NAME),snzb_05_0x19_zed)
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
-	@$(OBJCOPY) -v -O binary $(ELF_FILE) $(BIN_FILE)
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_CHECK) $(BIN_FILE)
-	@echo 'Create zigbee OTA file from' $(BIN_FILE)
-	@python3 $(MAKE_OTA) -t $(BOARD_NAME) -s "Slacky-DIY OTA" $(BIN_FILE) 
+	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	@echo 'Create zigbee OTA file'
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin 
+	@echo 'Create zigbee Tuya OTA file'
+	@python3 $(MAKE_OTA) -t $(PROJECT_NAME) -m 4742 -i 514 -v0x1111114b -s "Slacky-DIY OTA" $(BIN_PATH)/$(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 	@echo ' '
 	@echo 'Finished building: $@'
 	@echo ' '
+
+endif
 endif
 endif
 
