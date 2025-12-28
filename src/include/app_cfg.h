@@ -7,7 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -23,12 +23,8 @@
  *
  *******************************************************************************************************/
 
-#pragma once
-
-/* Enable C linkage for C++ Compilers: */
-#if defined(__cplusplus)
-extern "C" {
-#endif
+#ifndef SRC_INCLUDE_APP_CFG_H_
+#define SRC_INCLUDE_APP_CFG_H_
 
 #include "app_types.h"
 
@@ -49,7 +45,7 @@ extern "C" {
 #define APP_OTA_PERIODIC_QUERY_INTERVAL (1080 * 60)     /* start the OTA request after the set seconds */
 
 /* Debug mode config */
-#define UART_PRINTF_MODE                ON
+#define UART_PRINTF_MODE                OFF
 #define USB_PRINTF_MODE                 OFF
 
 #define DEBUG_BUTTON                    ON
@@ -61,20 +57,23 @@ extern "C" {
 #define DEBUG_STA_STATUS                OFF
 #define DEBUG_ONOFF                     ON
 
+#define ZB_APP_TX_POWER_IDX             RF_POWER_INDEX_P1p99dBm
+
+
 /**********************************************************************
  * Version configuration
  */
 #include "version_cfg.h"
 
 /* PM */
-#define PM_ENABLE						ON
+#define PM_ENABLE                       ON
 
 /* PA */
-#define PA_ENABLE						OFF
+#define PA_ENABLE                       OFF
 
 /* BDB */
-#define TOUCHLINK_SUPPORT				ON
-#define FIND_AND_BIND_SUPPORT			OFF
+#define TOUCHLINK_SUPPORT               ON
+#define FIND_AND_BIND_SUPPORT           OFF
 
 
 /* Board define */
@@ -105,14 +104,10 @@ extern "C" {
 #endif
 
 /* Board include */
-#if (BOARD == BOARD_ZG_222Z)
+#if defined(BOARD)
 #include "board_zg_222z.h"
-#elif (BOARD == BOARD_ZG_222ZA)
 #include "board_zg_222za.h"
-#elif (BOARD == BOARD_SNZB_05)
 #include "board_snzb_05.h"
-#else
-#error BOARD must be defined
 #endif
 
 /* Voltage detect module */
@@ -125,32 +120,32 @@ extern "C" {
  * we need to configure the detection IO port, and the IO must be connected to the target under test,
  * such as VCC.
  */
-#define VOLTAGE_DETECT_ENABLE                       ON
-#define VOLTAGE_DETECT_ADC_PIN                      VOLTAGE_DETECT_PIN
+#define VOLTAGE_DETECT_ENABLE           ON
+#define VOLTAGE_DETECT_ADC_PIN          VOLTAGE_DETECT_PIN
 
 /* Watch dog module */
-#define MODULE_WATCHDOG_ENABLE						OFF
+#define MODULE_WATCHDOG_ENABLE          OFF
 
 /* UART module */
-#define	MODULE_UART_ENABLE							OFF
+#define MODULE_UART_ENABLE              OFF
 
 #if (ZBHCI_USB_PRINT || ZBHCI_USB_CDC || ZBHCI_USB_HID || ZBHCI_UART)
-	#define ZBHCI_EN								1
+    #define ZBHCI_EN                    1
 #endif
 
 /**********************************************************************
  * ZCL cluster support setting
  */
-#define ZCL_GROUP_SUPPORT                           ON
-#define ZCL_SCENE_SUPPORT                           ON
-#define ZCL_IAS_ZONE_SUPPORT                        ON
-#define ZCL_POWER_CFG_SUPPORT                       ON
-#define ZCL_OTA_SUPPORT                             ON
+#define ZCL_GROUP_SUPPORT               ON
+#define ZCL_SCENE_SUPPORT               ON
+#define ZCL_IAS_ZONE_SUPPORT            ON
+#define ZCL_POWER_CFG_SUPPORT           ON
+#define ZCL_OTA_SUPPORT                 ON
 #if TOUCHLINK_SUPPORT
-#define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
+#define ZCL_ZLL_COMMISSIONING_SUPPORT   ON
 #endif
-#define ZCL_ON_OFF_SUPPORT                          ON
-#define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               ON
+#define ZCL_ON_OFF_SUPPORT              ON
+#define ZCL_ON_OFF_SWITCH_CFG_SUPPORT   ON
 
 /**********************************************************************
  * Stack configuration
@@ -162,13 +157,11 @@ extern "C" {
  * EV configuration
  */
 typedef enum{
-	EV_POLL_ED_DETECT,
-	EV_POLL_HCI,
+    EV_POLL_ED_DETECT,
+    EV_POLL_HCI,
     EV_POLL_IDLE,
-	EV_POLL_MAX,
+    EV_POLL_MAX,
 }ev_poll_e;
 
-/* Disable C linkage for C++ Compilers: */
-#if defined(__cplusplus)
-}
-#endif
+
+#endif /* SRC_INCLUDE_APP_CFG_H_ */
