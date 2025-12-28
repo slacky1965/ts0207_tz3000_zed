@@ -1,11 +1,10 @@
+#ifndef SRC_COMMON_BOARD_SNZB_05_H_
+#define SRC_COMMON_BOARD_SNZB_05_H_
 
-#pragma once
+#if (BOARD == BOARD_SNZB_05)
 
-/* Enable C linkage for C++ Compilers: */
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#define ZCL_BASIC_MODEL_ID     {13,'S','N','Z','B','-','0','5','-','z','-','S','l','D'}
 
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
@@ -67,7 +66,7 @@ enum {
 #define KB_DRIVE_PINS  {NULL }
 #define KB_SCAN_PINS   {BUTTON1}
 
-/* Disable C linkage for C++ Compilers: */
-#if defined(__cplusplus)
-}
-#endif
+
+#endif /* (BOARD == BOARD_SNZB_05) */
+
+#endif /* SRC_COMMON_BOARD_SNZB_05_H_ */
