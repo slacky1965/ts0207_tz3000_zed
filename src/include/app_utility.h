@@ -9,6 +9,7 @@
 #define TIMEOUT_TICK_10SEC  10*1000*1000    /* timeout 10 sec   */
 #define TIMEOUT_TICK_15SEC  15*1000*1000    /* timeout 15 sec   */
 #define TIMEOUT_TICK_30SEC  30*1000*1000    /* timeout 30 sec   */
+#define TIMEOUT_TICK_60SEC  60*1000*1000    /* timeout 60 sec   */
 
 /* for TL_ZB_TIMER_SCHEDULE() */
 #define TIMEOUT_10MS               10       /* timeout 10  ms   */
@@ -35,7 +36,10 @@
 #define TIMEOUT_15MIN       900  * 1000     /* timeout 15 min   */
 #define TIMEOUT_30MIN       1800 * 1000     /* timeout 30 min   */
 #define TIMEOUT_60MIN       3600 * 1000     /* timeout 60 min   */
-#define TIMEOUT_2HOUR  (TIMEOUT_60MIN*2)    /* timeout 2 hour   */
+#define TIMEOUT_2HOUR       7200 * 1000     /* timeout 2 hour   */
+#define TIMEOUT_3HOUR      10800 * 1000     /* timeout 3 hour   */
+#define TIMEOUT_4HOUR      14400 * 1000     /* timeout 4 hour   */
+#define TIMEOUT_8HOUR      28800 * 1000     /* timeout 8 hour   */
 
 extern bool factory_reset;
 
