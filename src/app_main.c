@@ -11,13 +11,13 @@ app_ctx_t g_appCtx = {
         .timerSetPollRateEvt = NULL,
         .timerOnOffRepeatEvt = NULL,
         .oriSta = false,
-        .led_ota = 4,                       // When OTA flash once every 1 minute
         .net_steer_start = false,
         .read_sensor_time = 0,
-        .battery_read = 4,                  // Once every 4 hours
         .leak = 0,
         .not_sleep = true,
         .ota = false,
+        .battery_read = 0,
+        .led_ota = 0,
 };
 
 //uint32_t count_restart = 0;
@@ -159,23 +159,14 @@ void user_app_init(void)
     ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&app_ep1Desc, &app_otaInfo, &app_otaCb);
 #endif
 
-//    uint8_t reg_data = app_get_analog_reg();
-//
-//    memcpy(&g_appCtx.analog_reg, &reg_data, 1);
-//
-//    if (g_appCtx.analog_reg.deep_sleep) {
-//        g_appCtx.leak = g_appCtx.analog_reg.leak;
-//    }
-//
-//    g_appCtx.analog_reg.deep_sleep = 0;
-//    g_appCtx.analog_reg.leak = 0;
-//    app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
-
     batteryCb(NULL);
 
-//    if (zb_getLocalShortAddr() < 0xFFF8) {
-//        app_setPollRate(TIMEOUT_20SEC);
-//    }
+#if DEBUG_BATTERY
+    g_appCtx.timerBatteryEvt = TL_ZB_TIMER_SCHEDULE(batteryCb, NULL, TIMEOUT_1MIN);
+#else
+    g_appCtx.timerBatteryEvt = TL_ZB_TIMER_SCHEDULE(batteryCb, NULL, BATTERY_TIMER_INTERVAL);
+#endif
+
 }
 
 void app_task(void) {
@@ -184,27 +175,24 @@ void app_task(void) {
     waterleak_handler();
 
     if (zb_isDeviceJoinedNwk()) {
-        if (clock_time_exceed(g_appCtx.read_sensor_time, TIMEOUT_TICK_15SEC)) {
-            g_appCtx.read_sensor_time = clock_time();
-            light_blink_stop();
-            if (g_appCtx.ota) {
-                if (g_appCtx.led_ota-- == 0) {
-                    g_appCtx.led_ota = 4;
-                    light_blink_start(1, 30, 30);
-                }
-            } else {
+
+        if (g_appCtx.ota) {
+            if (clock_time_exceed(g_appCtx.led_ota, TIMEOUT_TICK_60SEC)) {
+                g_appCtx.led_ota = clock_time();
                 light_blink_start(1, 30, 30);
             }
+        }
 
-            if (g_appCtx.battery_read-- == 0) {
-                g_appCtx.battery_read = 4;
-                if (!g_appCtx.ota) batteryCb(NULL);
+        if (clock_time_exceed(g_appCtx.read_sensor_time, TIMEOUT_TICK_5SEC)) {
+            g_appCtx.read_sensor_time = clock_time();
+            if (!g_appCtx.ota) {
+                light_blink_start(1, 30, 30);
             }
         }
     }
 
     if(bdb_isIdle()) {
-        report_handler();
+//        report_handler();
 #if PM_ENABLE
         button_handler();
         waterleak_handler();
@@ -310,8 +298,10 @@ void user_init(bool isRetention)
         /* Re-config phy when system recovery from deep sleep with retention */
         mac_phyReconfig();
         if (zb_getLocalShortAddr() < 0xFFF8 && !g_appCtx.timerSetPollRateEvt && !g_appCtx.ota) {
-            app_setPollRate(TIMEOUT_20SEC);
+            app_setPollRate(TIMEOUT_5SEC);
         }
     }
+
+    ZB_RADIO_TX_POWER_SET(ZB_APP_TX_POWER_IDX);
 }
 
