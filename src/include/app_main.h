@@ -43,7 +43,7 @@ typedef struct {
     button_t button[MAX_BUTTON_NUM];
     uint8_t  keyPressed;
 
-    uint8_t  led_ota;
+    uint32_t led_ota;
     uint16_t ledOnTime;
     uint16_t ledOffTime;
     uint8_t  oriSta;     //original state before blink
