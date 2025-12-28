@@ -1,6 +1,11 @@
 #ifndef SRC_COMMON_BOARD_SNZB_05_H_
 #define SRC_COMMON_BOARD_SNZB_05_H_
 
+#if (BOARD == BOARD_SNZB_05)
+
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#define ZCL_BASIC_MODEL_ID     {13,'S','N','Z','B','-','0','5','-','z','-','S','l','D'}
+
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
 #define DEBUG_INFO_TX_PIN       GPIO_PB1
@@ -60,5 +65,8 @@ enum {
 
 #define KB_DRIVE_PINS  {NULL }
 #define KB_SCAN_PINS   {BUTTON1}
+
+
+#endif /* (BOARD == BOARD_SNZB_05) */
 
 #endif /* SRC_COMMON_BOARD_SNZB_05_H_ */

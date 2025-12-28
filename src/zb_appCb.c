@@ -127,7 +127,7 @@ void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork) {
             g_appCtx.net_steer_start = false;
             app_setPollRate(TIMEOUT_20SEC);
 #ifdef ZCL_OTA
-            ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+            ota_queryStart(APP_OTA_PERIODIC_QUERY_INTERVAL);
 #endif
 
 #ifdef ZCL_POLL_CTRL
@@ -225,7 +225,7 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg) {
 			app_zclCheckInStart();
 #endif
 #ifdef ZCL_OTA
-			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+			ota_queryStart(APP_OTA_PERIODIC_QUERY_INTERVAL);
 #endif
 #if FIND_AND_BIND_SUPPORT
 			//start Finding & Binding

@@ -33,73 +33,58 @@ void app_wakeupPinLevelChange() {
 
 void app_lowPowerEnter() {
 
+//    printf("app_lowPowerEnter(). g_appCtx.not_sleep: %d\r\n", g_appCtx.not_sleep);
+
+    uint32_t durationMs = 0;
+
     app_wakeupPinLevelChange();
 
     if (g_appCtx.not_sleep) {
-        /* Deep sleep with SRAM retention */
+        /* SDK deep sleep with SRAM retention */
         drv_pm_lowPowerEnter();
-    } else /*if (zb_isDeviceJoinedNwk())*/ {
-        /* Deep sleep without SRAM retention */
-#if UART_PRINTF_MODE && DEBUG_PM
-        printf("Deep sleep start\r\n");
-#endif
-
-        if(tl_stackBusy() || !zb_isTaskDone()){
+    } else /*if (zb_isDeviceJoinedNwk())*/{
+        /* app deep sleep with SRAM retention */
+        if (tl_stackBusy() || !zb_isTaskDone()) {
 #if UART_PRINTF_MODE && DEBUG_PM
             printf("Stack or Task busy. Return from deep sleep start\r\n");
 #endif
             return;
         }
 
+        apsCleanToStopSecondClock();
 
-//    drv_pm_wakeupPinLevelChange(pin_PmCfg, sizeof(pin_PmCfg)/sizeof(drv_pm_pinCfg_t));
+        uint32_t r = drv_disable_irq();
+        rf_paShutDown();
 
-    apsCleanToStopSecondClock();
+        if (g_appCtx.timerOnOffRepeatEvt) {
+            durationMs = g_appCtx.timerOnOffRepeatEvt->timeout;
+        } else {
+            durationMs = TIME_LONG_DEEP_SLEEP * 1000;
+        }
 
-    uint32_t r = drv_disable_irq();
-    rf_paShutDown();
-    drv_pm_deepSleep_frameCnt_set(ss_outgoingFrameCntGet());
+#if UART_PRINTF_MODE && DEBUG_PM
+        printf("Long deep sleep start with time: %d sec\r\n", durationMs / 1000);
+#endif
 
-    g_appCtx.analog_reg.leak = g_appCtx.leak;
-    g_appCtx.analog_reg.deep_sleep = 1;
+        drv_pm_longSleep(PM_SLEEP_MODE_DEEP_WITH_RETENTION, PM_WAKEUP_SRC_PAD | PM_WAKEUP_SRC_TIMER, durationMs);
 
-    app_set_analog_reg((uint8_t*)&g_appCtx.analog_reg);
-
-    drv_pm_longSleep(PM_SLEEP_MODE_DEEPSLEEP, PM_WAKEUP_SRC_PAD | PM_WAKEUP_SRC_TIMER, (1000 * TIME_LONG_DEEP_SLEEP));
-
-    drv_restore_irq(r);
+        drv_restore_irq(r);
 
     }
 }
 
 #endif
 
-void app_set_analog_reg(uint8_t *reg_data) {
-    analog_write(APP_ANALOG_REG, *reg_data);
-}
 
-uint8_t app_get_analog_reg() {
-    return analog_read(APP_ANALOG_REG);
-}
-
-int32_t check_sleepCb(void *args) {
-
-    if (zb_getLocalShortAddr() < 0xFFF8) {
-
-        if (g_appCtx.ota) {
-            printf("check_sleepCb - OTA\r\n");
-            g_appCtx.timerCheckSleepEvt = NULL;
-            return -1;
-        }
-
-        printf("check_sleepCb - reset\r\n");
-        sleep_ms(250);
-
-        zb_resetDevice();
-        return -1;
-    }
-
-//    if (zb_isDeviceJoinedNwk()) {
+//int32_t check_sleepCb(void *args) {
+//
+//    if (zb_getLocalShortAddr() < 0xFFF8) {
+//
+//        if (g_appCtx.ota) {
+//            printf("check_sleepCb - OTA\r\n");
+//            g_appCtx.timerCheckSleepEvt = NULL;
+//            return -1;
+//        }
 //
 //        printf("check_sleepCb - reset\r\n");
 //        sleep_ms(250);
@@ -107,7 +92,16 @@ int32_t check_sleepCb(void *args) {
 //        zb_resetDevice();
 //        return -1;
 //    }
-
-    printf("check_sleepCb - no joined\r\n");
-    return 0;
-}
+//
+////    if (zb_isDeviceJoinedNwk()) {
+////
+////        printf("check_sleepCb - reset\r\n");
+////        sleep_ms(250);
+////
+////        zb_resetDevice();
+////        return -1;
+////    }
+//
+//    printf("check_sleepCb - no joined\r\n");
+//    return 0;
+//}
