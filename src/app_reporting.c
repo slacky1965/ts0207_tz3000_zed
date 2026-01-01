@@ -1,34 +1,47 @@
 #include "app_main.h"
 
-int32_t forcedReportCb(void *arg) {
+void forceReportBattery(void *args) {
 
-    if(zb_isDeviceJoinedNwk()){
-        epInfo_t dstEpInfo;
-        TL_SETSTRUCTCONTENT(dstEpInfo, 0);
-
-        dstEpInfo.profileId = HA_PROFILE_ID;
-#if FIND_AND_BIND_SUPPORT
-        dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
-#else
-        dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
-        dstEpInfo.dstEp = APP_ENDPOINT1;
-        dstEpInfo.dstAddr.shortAddr = 0xfffc;
+#if UART_PRINTF_MODE && DEBUG_BATTERY
+    printf("forceReportBattery()\r\n");
 #endif
-        zclAttrInfo_t *pAttrEntry;
-        pAttrEntry = zcl_findAttribute(APP_ENDPOINT1, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_VOLTAGE);
-        if (pAttrEntry)
-            zcl_sendReportCmd(APP_ENDPOINT1, &dstEpInfo,  TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
-                    ZCL_CLUSTER_GEN_POWER_CFG, pAttrEntry->id, pAttrEntry->type, pAttrEntry->data);
 
-        pAttrEntry = zcl_findAttribute(APP_ENDPOINT1, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_PERCENTAGE_REMAINING);
-        if (pAttrEntry)
-            zcl_sendReportCmd(APP_ENDPOINT1, &dstEpInfo,  TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
-                    ZCL_CLUSTER_GEN_POWER_CFG, pAttrEntry->id, pAttrEntry->type, pAttrEntry->data);
+    struct report_t {
+        u8 numAttr;
+        zclReport_t attr[2];
+    };
 
+    struct report_t report;
+
+    epInfo_t dstEpInfo;
+    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+
+    dstEpInfo.profileId = HA_PROFILE_ID;
+    dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
+
+    report.numAttr = 0;
+
+    zclAttrInfo_t *pAttrEntry;
+
+    pAttrEntry = zcl_findAttribute(APP_ENDPOINT1, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_VOLTAGE);
+
+    if (pAttrEntry) {
+        report.attr[report.numAttr].attrID = pAttrEntry->id;
+        report.attr[report.numAttr].dataType = pAttrEntry->type;
+        report.attr[report.numAttr].attrData = pAttrEntry->data;
+        report.numAttr++;
     }
 
-    g_appCtx.timerForcedReportEvt = NULL;
+    pAttrEntry = zcl_findAttribute(APP_ENDPOINT1, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_PERCENTAGE_REMAINING);
 
-    return -1;
+    if (pAttrEntry) {
+        report.attr[report.numAttr].attrID = pAttrEntry->id;
+        report.attr[report.numAttr].dataType = pAttrEntry->type;
+        report.attr[report.numAttr].attrData = pAttrEntry->data;
+        report.numAttr++;
+    }
+
+    if (report.numAttr) {
+        zcl_sendReportAttrsCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, ZCL_FRAME_SERVER_CLIENT_DIR, ZCL_CLUSTER_GEN_POWER_CFG, (zclReportCmd_t* )&report);
+    }
 }
-

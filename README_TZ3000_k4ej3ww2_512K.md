@@ -33,5 +33,9 @@
 
 <img src="doc/images/about_zg_222z.jpg"/>
 
-P.S. Приобретался датчик на [Озоне](https://www.ozon.ru/product/datchik-protechki-tuya-zigbee-3-0-1592445428/)
+Еще можно воспользоваться `usb-uart` адаптером. Как залить прошивку можно почитать [тут](https://github.com/pvvx/ATC_MiThermometer?tab=readme-ov-file#the-usb-com-adapter-writes-the-firmware-in-explorer-web-version). Зайдите на страницу [USBCOMFlashTx.html](https://pvvx.github.io/ATC_MiThermometer/USBCOMFlashTx.html). Назначьте порт - `Open`. Нажмите на кнопку на датчике, светодиод должен моргнуть. Далее нажмите `Erase All Flash`. Когда в логе отразится, что очистка завершена, снова нажмите на кнопку. Светодитод не должен моргать. Если он моргнет, значит вы ничего не стерли - проверьте подключение. Если не моргает, значит все хорошо. Выберите файл [zg_222z_512K_V1.0.03.bin](bin/zg_222z_512K_V1.0.03.bin) (версия может быть уже другой!). И нажмите `Write to Flash`. 
+
+ ## P.S.
+ 
+ Приобретался датчик на [Озоне](https://www.ozon.ru/product/datchik-protechki-tuya-zigbee-3-0-1592445428/)
 

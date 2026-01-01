@@ -61,5 +61,7 @@ ota:
 
 <img src="doc/images/about_snzb_05.jpg"/>
 
-P.S. Приобретался датчик на [WB](https://www.wildberries.ru/catalog/265993742/detail.aspx?targetUrl=EX)
+## P.S.
+
+Приобретался датчик на [WB](https://www.wildberries.ru/catalog/265993742/detail.aspx?targetUrl=EX)
 

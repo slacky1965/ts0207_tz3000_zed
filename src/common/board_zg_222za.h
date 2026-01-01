@@ -1,9 +1,12 @@
 #ifndef SRC_COMMON_BOARD_ZG_222ZA_H_
 #define SRC_COMMON_BOARD_ZG_222ZA_H_
 
+#if (BOARD == BOARD_ZG_222ZA)
+
 /* boadr on ZTU or TLSR8258F1 */
 
-#define CHIP_FLASH_SIZE     1024
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
+#define ZCL_BASIC_MODEL_ID     {14,'Z','G','-','2','2','2','Z','A','-','z','-','S','l','D'}
 
 /**************************** Configure UART ***************************************/
 #if UART_PRINTF_MODE
@@ -24,12 +27,12 @@
 #define PB4_INPUT_ENABLE        OFF
 #define PB4_DATA_OUT            LED_OFF
 
-#define LED_POWER               GPIO_PA0
-#define PA0_FUNC                AS_GPIO
-#define PA0_OUTPUT_ENABLE       ON
-#define PA0_INPUT_ENABLE        OFF
-
-#define LED_PERMIT              LED_STATUS
+//#define LED_POWER               GPIO_PA0
+//#define PA0_FUNC                AS_GPIO
+//#define PA0_OUTPUT_ENABLE       ON
+//#define PA0_INPUT_ENABLE        OFF
+//
+//#define LED_PERMIT              LED_STATUS
 #define LED1                    LED_STATUS
 
 
@@ -64,5 +67,8 @@ enum {
 
 #define KB_DRIVE_PINS  {NULL }
 #define KB_SCAN_PINS   {BUTTON1}
+
+#endif /* (BOARD == BOARD_ZG_222ZA) */
+
 
 #endif /* SRC_COMMON_BOARD_ZG_222ZA_H_ */

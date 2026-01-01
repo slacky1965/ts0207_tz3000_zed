@@ -22,6 +22,7 @@ int32_t batteryCb(void *arg) {
     epInfo_t dstEpInfo;
     zoneStatusChangeNoti_t statusChangeNotification;
 
+
     uint16_t voltage_raw = drv_get_adc_data();
     uint8_t voltage = (uint8_t)(voltage_raw/100);
     uint8_t level = get_battery_level(voltage_raw);
@@ -65,6 +66,9 @@ int32_t batteryCb(void *arg) {
        }
     }
 
+    if(zb_isDeviceJoinedNwk()) {
+        TL_SCHEDULE_TASK(forceReportBattery, NULL);
+    }
 
     return 0;
 }

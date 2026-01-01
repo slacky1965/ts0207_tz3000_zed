@@ -2,7 +2,8 @@
 #define SRC_INCLUDE_APP_PM_H_
 
 #define APP_ANALOG_REG          DEEP_ANA_REG1   // analog register
-#define TIME_LONG_DEEP_SLEEP    3600             // Time of long deep sleep in sec. 3600
+#define TIME_LONG_DEEP_SLEEP    3600            // Time of long deep sleep in sec. 3600
+#define TIME_REPEAT_ONOFF       TIMEOUT_5MIN    // Repeat time of the on/off command if the leak continues
 
 #if PM_ENABLE
 
