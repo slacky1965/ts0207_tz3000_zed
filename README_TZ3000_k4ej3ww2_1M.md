@@ -32,9 +32,9 @@
 
 Далее нужно добавить локальное хранилище обновлений. 
 
-Создаем директорию `images` в директории `zigbee2mqtt` и кладем туда файл [1141-d3a3-1111114b-zg_222za-1M.zigbee](bin/1141-d3a3-1111114b-zg_222za-1M.zigbee).
+Создаем директорию `images` в директории `zigbee2mqtt` и кладем туда файл [1141-d3a3-1111114b-zg_227za_0x17_zed.zigbee](bin/1141-d3a3-1111114b-zg_227za_0x17_zed.zigbee).
 
-Копируем в директорию `zigbee2mqtt` файл [local_ota_index.json](zigbee2mqtt/local_ota_index.json)
+Копируем в директорию `zigbee2mqtt` файл [local_ota_index.json](zigbee2mqtt/local_ota_index/0x17/local_ota_index.json)
 
 В конфиг `zigbee2mqtt` `configuration.yaml` добавляем локальное хранилище
 
