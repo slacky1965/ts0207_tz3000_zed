@@ -58,6 +58,7 @@ static void buttonSinglePressed(u8 btNum) {
 #endif
             if(zb_isDeviceJoinedNwk()){
                 app_setPollRate(TIMEOUT_20SEC);
+                TL_SCHEDULE_TASK(forceReportBattery, NULL);
             } else {
                 zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
             }
