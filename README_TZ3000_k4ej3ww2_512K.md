@@ -25,7 +25,7 @@
 
 <img src="doc/images/board_zg-222z_pins.jpg"/>
 
-Файл для прошивки нужен вот такой - [zg_222z_512K_V1.0.03.bin](bin/zg_222z_512K_V1.0.03.bin)
+Файл для прошивки нужен вот такой - [zg_227z_0x18_zed_V1.0.05.bin](bin/zg_227z_0x18_zed_V1.0.05.bin)
 
 Прежде, чем заливать прошивку, модуль лучше очистить полностью от предыдущей информации, хранящейся на флеш-памяти.
 
@@ -33,7 +33,7 @@
 
 <img src="doc/images/about_zg_222z.jpg"/>
 
-Еще можно воспользоваться `usb-uart` адаптером. Как залить прошивку можно почитать [тут](https://github.com/pvvx/ATC_MiThermometer?tab=readme-ov-file#the-usb-com-adapter-writes-the-firmware-in-explorer-web-version). Зайдите на страницу [USBCOMFlashTx.html](https://pvvx.github.io/ATC_MiThermometer/USBCOMFlashTx.html). Назначьте порт - `Open`. Нажмите на кнопку на датчике, светодиод должен моргнуть. Далее нажмите `Erase All Flash`. Когда в логе отразится, что очистка завершена, снова нажмите на кнопку. Светодитод не должен моргать. Если он моргнет, значит вы ничего не стерли - проверьте подключение. Если не моргает, значит все хорошо. Выберите файл [zg_222z_512K_V1.0.03.bin](bin/zg_222z_512K_V1.0.03.bin) (версия может быть уже другой!). И нажмите `Write to Flash`. 
+Еще можно воспользоваться `usb-uart` адаптером. Как залить прошивку можно почитать [тут](https://github.com/pvvx/ATC_MiThermometer?tab=readme-ov-file#the-usb-com-adapter-writes-the-firmware-in-explorer-web-version). Зайдите на страницу [USBCOMFlashTx.html](https://pvvx.github.io/ATC_MiThermometer/USBCOMFlashTx.html). Назначьте порт - `Open`. Нажмите на кнопку на датчике, светодиод должен моргнуть. Далее нажмите `Erase All Flash`. Когда в логе отразится, что очистка завершена, снова нажмите на кнопку. Светодитод не должен моргать. Если он моргнет, значит вы ничего не стерли - проверьте подключение. Если не моргает, значит все хорошо. Выберите файл [zg_227z_0x18_zed_V1.0.05.bin](bin/zg_227z_0x18_zed_V1.0.05.bin) (версия может быть уже другой!). И нажмите `Write to Flash`. 
 
  ## P.S.
  
