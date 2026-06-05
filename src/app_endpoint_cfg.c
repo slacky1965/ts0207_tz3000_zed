@@ -72,6 +72,9 @@ const uint16_t app_ep1_outClusterList[] =
 #ifdef ZCL_ON_OFF
     ZCL_CLUSTER_GEN_ON_OFF,
 #endif
+#ifdef ZCL_IAS_ZONE
+    ZCL_CLUSTER_SS_IAS_ZONE,
+#endif
 };
 
 /**

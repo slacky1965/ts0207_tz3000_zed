@@ -45,7 +45,7 @@
 #define APP_OTA_PERIODIC_QUERY_INTERVAL (1080 * 60)     /* start the OTA request after the set seconds */
 
 /* Debug mode config */
-#define UART_PRINTF_MODE                OFF
+#define UART_PRINTF_MODE                ON
 #define USB_PRINTF_MODE                 OFF
 
 #define DEBUG_BUTTON                    ON

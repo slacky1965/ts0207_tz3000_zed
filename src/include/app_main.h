@@ -12,6 +12,7 @@
 #include "app_on_off.h"
 #include "app_pm.h"
 #include "app_leak.h"
+#include "app_ias.h"
 #include "app_battery.h"
 #include "app_reporting.h"
 #include "app_endpoint_cfg.h"
@@ -84,7 +85,6 @@ status_t app_pollCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
 status_t app_temperatureCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t app_humidityCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t leak_iasZoneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-
 void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf);
 void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd);
 void app_otaProcessMsgHandler(uint8_t evt, uint8_t status);

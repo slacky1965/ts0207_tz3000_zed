@@ -101,7 +101,6 @@ static void buttonCheckCommand(uint8_t btNum) {
 void keyScan_keyPressedCB(kb_data_t *kbEvt) {
 
     uint16_t len;
-    epInfo_t dstEpInfo;
     zoneStatusChangeNoti_t statusChangeNotification;
     u8 keyCode = kbEvt->keycode[0];
 
@@ -111,8 +110,6 @@ void keyScan_keyPressedCB(kb_data_t *kbEvt) {
         g_appCtx.button[keyCode-1].ctn++;
         light_blink_start(1, 30, 1);
         if (zb_isDeviceJoinedNwk()) {
-            fillIASAddress(&dstEpInfo);
-
             zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, &len, (uint8_t*)&statusChangeNotification.zoneStatus);
             zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_ID, &len, &statusChangeNotification.zoneId);
 
@@ -121,7 +118,7 @@ void keyScan_keyPressedCB(kb_data_t *kbEvt) {
             statusChangeNotification.extStatus = 0;
             statusChangeNotification.delay = 0;
 
-            zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+            sendIasNotification(&statusChangeNotification);
         }
     }
 }
@@ -130,7 +127,6 @@ void keyScan_keyPressedCB(kb_data_t *kbEvt) {
 void keyScan_keyReleasedCB(u8 keyCode){
 
     uint16_t len;
-    epInfo_t dstEpInfo;
     zoneStatusChangeNoti_t statusChangeNotification;
 
     if (keyCode != 0xff) {
@@ -138,8 +134,6 @@ void keyScan_keyReleasedCB(u8 keyCode){
         g_appCtx.button[keyCode-1].state = APP_STATE_RELEASE;
 
         if(zb_isDeviceJoinedNwk()) {
-            fillIASAddress(&dstEpInfo);
-
             zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, &len, (uint8_t*)&statusChangeNotification.zoneStatus);
             zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_ID, &len, &statusChangeNotification.zoneId);
 
@@ -148,7 +142,7 @@ void keyScan_keyReleasedCB(u8 keyCode){
             statusChangeNotification.extStatus = 0;
             statusChangeNotification.delay = 0;
 
-            zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+            sendIasNotification(&statusChangeNotification);
 
         }
     }

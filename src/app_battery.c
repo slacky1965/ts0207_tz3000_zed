@@ -19,9 +19,7 @@ static uint8_t get_battery_level(uint16_t battery_mv) {
 int32_t batteryCb(void *arg) {
 
     uint16_t len;
-    epInfo_t dstEpInfo;
     zoneStatusChangeNoti_t statusChangeNotification;
-
 
     uint16_t voltage_raw = drv_get_adc_data();
     uint8_t voltage = (uint8_t)(voltage_raw/100);
@@ -36,8 +34,6 @@ int32_t batteryCb(void *arg) {
     zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_VOLTAGE, &voltage);
     zcl_setAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_PERCENTAGE_REMAINING, &level);
 
-    fillIASAddress(&dstEpInfo);
-
     zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_STATUS, &len, (uint8_t*)&statusChangeNotification.zoneStatus);
     zcl_getAttrVal(APP_ENDPOINT1, ZCL_CLUSTER_SS_IAS_ZONE, ZCL_ATTRID_ZONE_ID, &len, &statusChangeNotification.zoneId);
 
@@ -50,7 +46,7 @@ int32_t batteryCb(void *arg) {
             statusChangeNotification.extStatus = 0;
             statusChangeNotification.delay = 0;
 
-            zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+            sendIasNotification(&statusChangeNotification);
         }
 
     } else {
@@ -62,7 +58,7 @@ int32_t batteryCb(void *arg) {
            statusChangeNotification.extStatus = 0;
            statusChangeNotification.delay = 0;
 
-           zcl_iasZone_statusChangeNotificationCmd(APP_ENDPOINT1, &dstEpInfo, TRUE, &statusChangeNotification);
+           sendIasNotification(&statusChangeNotification);
        }
     }
 

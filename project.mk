@@ -13,6 +13,7 @@ $(OUT_PATH)/$(SRC_PATH)/app_led.o \
 $(OUT_PATH)/$(SRC_PATH)/app_on_off.o \
 $(OUT_PATH)/$(SRC_PATH)/app_battery.o \
 $(OUT_PATH)/$(SRC_PATH)/app_pm.o \
+$(OUT_PATH)/$(SRC_PATH)/app_ias.o \
 $(OUT_PATH)/$(SRC_PATH)/app_leak.o \
 $(OUT_PATH)/$(SRC_PATH)/app_reporting.o \
 $(OUT_PATH)/$(SRC_PATH)/app_endpoint_cfg.o \
